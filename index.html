@@ -7,7 +7,7 @@
   <!-- QR matrix engine: generates the raw (square) QR with Level H error correction.
        We then re-render it onto <canvas> through a template-object mask. -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="frontend/css/styles.css" />
 </head>
 <body>
 
@@ -19,21 +19,21 @@
     <div class="control-panel">
 
       <!-- Input-type selector. Populated by app.js from backend /api/input-types,
-           with fallback to the local INPUT_TYPES registry in js/inputs.js.
+           with fallback to the local INPUT_TYPES registry in frontend/js/inputs.js.
            Only "website" is fully wired today; add new types without touching HTML. -->
       <div class="form-group">
         <label for="input-type-select">Input Type</label>
         <select id="input-type-select"></select>
       </div>
 
-      <!-- Per-type fields are rendered here dynamically (see js/inputs.js).
+      <!-- Per-type fields are rendered here dynamically (see frontend/js/inputs.js).
            For "website" this is a single URL field with auto-https normalization. -->
       <div class="form-group" id="dynamic-fields"></div>
 
       <!-- Template-object selector. Buttons are rendered by app.js from
-           backend /api/templates, drawing logic lives in js/templates.js.
+           backend /api/templates, drawing logic lives in frontend/js/templates.js.
            The shape is expressed with contrast (fade), not deletion, so every
-           QR stays scannable — see js/renderer.js. -->
+           QR stays scannable — see frontend/js/renderer.js. -->
       <div class="form-group">
         <label>Template Object</label>
         <div class="shape-grid" id="shape-grid"></div>
@@ -68,9 +68,9 @@
   </div>
 
   <!-- Order matters: registries -> renderer -> app glue -->
-  <script src="js/inputs.js"></script>
-  <script src="js/templates.js"></script>
-  <script src="js/renderer.js"></script>
-  <script src="js/app.js"></script>
+  <script src="frontend/js/inputs.js"></script>
+  <script src="frontend/js/templates.js"></script>
+  <script src="frontend/js/renderer.js"></script>
+  <script src="frontend/js/app.js"></script>
 </body>
 </html>

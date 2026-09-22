@@ -2,8 +2,12 @@
  * server.js — minimal backend for QR Shape Mask Studio.
  *
  * Responsibilities:
- *   1. Serve frontend/ as static files (so `npm start` gives you the full app
- *      at http://localhost:3000 with no build step).
+ *   1. Serve the app (root index.html + frontend/ assets) so `npm start`
+ *      gives you the full app at http://localhost:3000 with no build step.
+ *      index.html lives at the repo root for GitHub Pages; assets stay in
+ *      frontend/css + frontend/js and are mounted at /frontend to match the
+ *      Pages-relative paths (the bare static mount keeps old /css + /js URLs
+ *      working too).
  *   2. Serve /api/input-types and /api/templates from JSON config files.
  *      The frontend treats these lists as the source of truth for WHAT is
  *      enabled (and in what order); the drawing/encoding logic stays in
@@ -19,6 +23,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const FRONTEND_DIR = path.join(__dirname, '..', 'frontend');
+const ROOT_DIR = path.join(__dirname, '..');
 const CONFIG_DIR = path.join(__dirname, 'config');
 
 function loadJson(name) {
@@ -38,8 +43,16 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
 
-// Static frontend (index.html, css/, js/) — must come after /api routes.
+// Static assets. /frontend/* mirrors the GitHub Pages relative paths used by
+// root index.html; the bare mount keeps legacy /css/* + /js/* URLs working.
+// Must come after /api routes.
+app.use('/frontend', express.static(FRONTEND_DIR));
 app.use(express.static(FRONTEND_DIR));
+
+// Root entry page (lives at repo root for GitHub Pages).
+app.get('/', (req, res) => {
+  res.sendFile(path.join(ROOT_DIR, 'index.html'));
+});
 
 app.listen(PORT, () => {
   console.log(`QR Shape Mask Studio: http://localhost:${PORT}`);

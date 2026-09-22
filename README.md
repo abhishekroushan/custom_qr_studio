@@ -11,17 +11,17 @@ Derived from `prototype.md` (single-file prototype), refactored into a modular
 
 ```
 .
+├── index.html                # page skeleton (repo root, for GitHub Pages)
 ├── prototype.md                # original single-file prototype (reference)
 ├── frontend/
-│   ├── index.html              # page skeleton: controls left, canvas preview right
 │   ├── css/styles.css          # dark-theme layout (extracted from prototype)
 │   └── js/
 │       ├── inputs.js           # INPUT_TYPES registry — what can become a QR
 │       ├── templates.js        # TEMPLATE_OBJECTS registry — overlay shapes
-│       ├── renderer.js         # QRShapeRenderer: QR → mask → finder-pattern fix
+│       ├── renderer.js         # QRShapeRenderer: QR → fade wash → finder fix
 │       └── app.js              # glue: config fetch, dynamic form, events
 ├── backend/
-│   ├── server.js               # Express: serves frontend/ + /api/* config
+│   ├── server.js               # Express: serves root index.html + /api/* config
 │   ├── package.json
 │   └── config/
 │       ├── input-types.json    # which input types are enabled + field metadata
@@ -31,7 +31,7 @@ Derived from `prototype.md` (single-file prototype), refactored into a modular
 
 ## How the HTML works
 
-### `frontend/index.html` — the page
+### `index.html` — the page
 
 The page has two columns inside `.container`:
 
@@ -54,14 +54,15 @@ The page has two columns inside `.container`:
      output: white background + masked QR + restored finder patterns.
    - Warning text noting Level H error correction is active.
 
-3. **Script loading (order matters)**
-   ```html
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-   <script src="js/inputs.js"></script>
-   <script src="js/templates.js"></script>
-   <script src="js/renderer.js"></script>
-   <script src="js/app.js"></script>
-   ```
+3. **Script loading (order matters)** — asset paths are relative to the repo
+    root so the same file works on GitHub Pages and via the backend:
+    ```html
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="frontend/js/inputs.js"></script>
+    <script src="frontend/js/templates.js"></script>
+    <script src="frontend/js/renderer.js"></script>
+    <script src="frontend/js/app.js"></script>
+    ```
    The CDN provides the `QRCode` global with `QRCode.CorrectLevel.H`.
    (Note: `prototype.md` listed `https://cloudflare.com` as the script src,
    which is not a JS file — the modular version uses the correct cdnjs URL.)
@@ -78,8 +79,8 @@ Each keystroke / shape click runs:
 3. **Outside-shape wash** — build an even-odd path (full-canvas rect + template
    silhouette from `TEMPLATE_OBJECTS`), `clip('evenodd')`, then fill with
    `rgba(255,255,255,fade)`. Inside-shape modules stay pure black; outside
-   modules turn light gray — visually receding but still decodable. The
-   **fade slider** (0–95%, default 78%) controls this live via the cheap
+    modules turn light gray — visually receding but still decodable. The
+    **fade slider** (0–95%, default 60%) controls this live via the cheap
    `renderer.refade()` path, which reuses the cached raw QR without
    regenerating the matrix. `square` skips the wash (plain QR).
 4. **Finder-pattern restore** — the 3 corner squares (top-left, top-right,
@@ -116,17 +117,28 @@ inset 5%). Backend JSON controls the button list/order.
 
 ## Run it
 
-**Option A — with backend (recommended):**
+**Option A — with backend (recommended for local dev):**
 ```bash
 cd backend
 npm install
 npm start
 # open http://localhost:3000
 ```
+The server serves root `index.html` plus `/api/*` config; `frontend/` assets
+are mounted at `/frontend` to match the Pages-relative paths.
 
-**Option B — frontend only:**
-open `frontend/index.html` directly (or `npx serve frontend`). The app detects
-missing `/api/*` and falls back to the local JS registries.
+**Option B — GitHub Pages (no backend):**
+`index.html` lives at the repo root, so enable Pages with **Deploy from a
+branch**, folder **/** (root). The app detects the missing `/api/*` endpoints
+and falls back to the local `INPUT_TYPES` / `TEMPLATE_OBJECTS` registries —
+full functionality, no server. (Requires internet for the qrcodejs CDN.)
+
+**Option C — static preview locally:**
+```bash
+npx serve .
+# open the printed URL — index.html loads at /
+```
+Same fallback behavior as Pages.
 
 ## Extending
 
