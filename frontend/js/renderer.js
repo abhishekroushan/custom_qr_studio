@@ -19,8 +19,10 @@
  * of deletion to express the shape.
  *
  * fadeStrength: 0 = no wash (plain square QR), 1 = outside fully white
- * (equivalent to the old hard-clip look, minus finder restore). ~0.75-0.85
- * is the usable experimental range; exposed in the UI as a slider.
+ * (equivalent to the old hard-clip look, minus finder restore). Measured safe
+ * zone: Heart scans reliably at ≤0.65 on a real phone camera, so the UI
+ * defaults to 0.60 for headroom across phones/lighting. Exposed as a slider
+ * for per-shape experimentation.
  */
 
 class QRShapeRenderer {
@@ -42,7 +44,7 @@ class QRShapeRenderer {
    * @param {string} templateId  key in TEMPLATE_OBJECTS
    * @param {number} fadeStrength  0..1, how strongly to wash outside modules
    */
-  render(payload, templateId, fadeStrength = 0.78) {
+  render(payload, templateId, fadeStrength = 0.60) {
     this.rawQrDiv.innerHTML = '';
 
     new QRCode(this.rawQrDiv, {

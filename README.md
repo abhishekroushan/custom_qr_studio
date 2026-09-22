@@ -89,9 +89,14 @@ Each keystroke / shape click runs:
 Why fade instead of hard-clip? The original hard-clip deleted every module
 outside the heart/star path. Level H only recovers ~30% damage and a heart
 crop destroys far more — hence only "Full Block" scanned. Fade keeps 100% of
-modules and expresses the shape through contrast instead of deletion. If a
-phone camera struggles, lower the fade slider; if the shape looks weak, raise
-it.
+modules and expresses the shape through contrast instead of deletion.
+
+Measured threshold (real phone camera, Heart template): scanning starts
+working at ~65–66% fade and passes reliably below 65%. In pixel terms, a 65%
+white wash turns black modules to gray ~166 — dimmer than that and decoders
+give up. The UI therefore defaults to 60% (headroom for other phones/lighting).
+Other shapes will have their own nearby thresholds; the slider max (95%) is
+kept for experimentation, not production use.
 
 ### Input templatizing (`js/inputs.js` + `backend/config/input-types.json`)
 

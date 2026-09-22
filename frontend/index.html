@@ -40,12 +40,12 @@
       </div>
 
       <!-- Fade strength: how strongly modules outside the silhouette are
-           washed out. 0 = plain square QR, ~0.78 default, 1 = old hard-clip look.
-           Wired to renderer.refade() in app.js for live experimentation. -->
+           washed out. 0 = plain square QR, 0.60 default (safe), ~0.65 = measured
+           Heart scan threshold on a real camera. Wired to renderer.refade(). -->
       <div class="form-group">
-        <label for="fade-slider">Outside-shape fade: <span id="fade-value">78%</span></label>
-        <input type="range" id="fade-slider" min="0" max="95" value="78" step="1" />
-        <div class="field-hint">Lower = easier to scan. Higher = stronger shape effect.</div>
+        <label for="fade-slider">Outside-shape fade: <span id="fade-value">60%</span></label>
+        <input type="range" id="fade-slider" min="0" max="95" value="60" step="1" />
+        <div class="field-hint">Lower = easier to scan. Heart tested safe at ≤65% — default 60% leaves headroom.</div>
       </div>
 
       <div class="form-group">
