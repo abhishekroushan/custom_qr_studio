@@ -32,10 +32,20 @@
 
       <!-- Template-object selector. Buttons are rendered by app.js from
            backend /api/templates, drawing logic lives in js/templates.js.
-           To add a shape: add a JSON entry + a draw function, no HTML change. -->
+           The shape is expressed with contrast (fade), not deletion, so every
+           QR stays scannable — see js/renderer.js. -->
       <div class="form-group">
         <label>Template Object</label>
         <div class="shape-grid" id="shape-grid"></div>
+      </div>
+
+      <!-- Fade strength: how strongly modules outside the silhouette are
+           washed out. 0 = plain square QR, ~0.78 default, 1 = old hard-clip look.
+           Wired to renderer.refade() in app.js for live experimentation. -->
+      <div class="form-group">
+        <label for="fade-slider">Outside-shape fade: <span id="fade-value">78%</span></label>
+        <input type="range" id="fade-slider" min="0" max="95" value="78" step="1" />
+        <div class="field-hint">Lower = easier to scan. Higher = stronger shape effect.</div>
       </div>
 
       <div class="form-group">
@@ -50,8 +60,9 @@
       <div id="raw-qr" aria-hidden="true"></div>
       <canvas id="output-canvas" width="400" height="400"></canvas>
       <div class="warning-text">
-        ⚠️ Level H (30%) Error Correction active. Corner position anchors remain
-        unmasked to preserve baseline hardware camera tracking.
+        ⚠️ Level H (30%) Error Correction active. Shapes use a contrast fade —
+        not deletion — so corner anchors and data modules stay decodable.
+        If a camera struggles, lower the fade slider.
       </div>
     </div>
   </div>

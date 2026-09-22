@@ -1,21 +1,26 @@
 /**
  * renderer.js — the QR + template-object compositing pipeline.
  *
- * Pipeline (same as prototype.md, cleaned up + bug-fixed):
+ * Pipeline (opacity/fade approach — v2):
  *   1. Generate a raw square QR with qrcodejs at CorrectLevel.H (30% recovery).
- *      High error correction is what lets us crop pixels into heart/star/etc.
- *      shapes and still scan.
- *   2. Clear the visible <canvas>, paint it white.
- *   3. Build the template silhouette path (from TEMPLATE_OBJECTS) and ctx.clip().
- *   4. drawImage() the raw QR stretched over the canvas — only pixels inside
- *      the silhouette survive.
- *   5. Re-stamp the 3 finder-pattern anchors (top-left, top-right, bottom-left)
- *      unclipped on top. Scanners lock onto these squares first; if they are
- *      cropped the code won't read.
+ *   2. Paint the FULL QR onto the canvas at full contrast (white bg + full matrix).
+ *      Nothing is deleted here, so the complete data pattern always survives.
+ *   3. Wash out everything OUTSIDE the template silhouette with a translucent
+ *      white overlay (default ~78% opaque). Inside-shape modules stay pure
+ *      black; outside-shape modules become light gray — still present for the
+ *      decoder, but visually receding so the shape reads clearly.
+ *   4. Re-stamp the 3 finder-pattern anchors (top-left, top-right, bottom-left)
+ *      at full contrast on top. Scanners lock onto these squares first.
  *
- * Prototype bug fixed here: the original computed anchorSize in canvas pixels
- * but used it as *source* pixels against a differently-sized qrImg. We now
- * scale source and destination rectangles independently.
+ * Why not hard-clip? Hard-clipping (v1 / prototype.md) deleted every module
+ * outside the heart/star/etc. path. Level H only recovers ~30% damage, and a
+ * heart/star crop destroys far more than that — so only "Full Block" scanned.
+ * The fade approach keeps 100% of modules decodable and uses contrast instead
+ * of deletion to express the shape.
+ *
+ * fadeStrength: 0 = no wash (plain square QR), 1 = outside fully white
+ * (equivalent to the old hard-clip look, minus finder restore). ~0.75-0.85
+ * is the usable experimental range; exposed in the UI as a slider.
  */
 
 class QRShapeRenderer {
@@ -28,15 +33,16 @@ class QRShapeRenderer {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     this.tempoTimer = null;
+    this.lastArgs = null; // for fade-only re-renders without regenerating QR
   }
 
   /**
    * Render payload string through a template object id.
-   * Debounced internally not here — app.js calls this on each keystroke.
    * @param {string} payload
    * @param {string} templateId  key in TEMPLATE_OBJECTS
+   * @param {number} fadeStrength  0..1, how strongly to wash outside modules
    */
-  render(payload, templateId) {
+  render(payload, templateId, fadeStrength = 0.78) {
     this.rawQrDiv.innerHTML = '';
 
     new QRCode(this.rawQrDiv, {
@@ -46,51 +52,81 @@ class QRShapeRenderer {
       correctLevel: QRCode.CorrectLevel.H,
     });
 
-    // qrcodejs paints async (creates img/canvas/table). Poll briefly,
-    // then composite. Prefer img.onload over a blind timeout when possible.
     clearTimeout(this.tempoTimer);
-    this.tempoTimer = setTimeout(() => this._composite(templateId), 60);
+    this.tempoTimer = setTimeout(() => this._composite(templateId, fadeStrength), 60);
   }
 
-  _composite(templateId) {
+  /**
+   * Re-apply the fade wash without regenerating the QR matrix (cheap, runs on
+   * every slider movement). Falls back to full render if no QR exists yet.
+   */
+  refade(templateId, fadeStrength) {
     const qrImg = this.rawQrDiv.querySelector('img');
     const qrCanvas = this.rawQrDiv.querySelector('canvas');
     const source = qrImg && qrImg.complete && qrImg.naturalWidth ? qrImg : qrCanvas;
-    if (!source) return;
-    if (qrImg && !qrImg.complete) {
-      // Image not decoded yet — retry once shortly.
-      clearTimeout(this.tempoTimer);
-      this.tempoTimer = setTimeout(() => this._composite(templateId), 60);
+    if (!source) {
+      // No raw QR cached yet (shouldn't happen after init) — do a full render.
+      if (this.lastArgs) this.render(this.lastArgs.payload, templateId, fadeStrength);
       return;
     }
-    this._drawMasked(source, templateId);
+    this._composite(templateId, fadeStrength, source);
+  }
+
+  _composite(templateId, fadeStrength, knownSource) {
+    const qrImg = this.rawQrDiv.querySelector('img');
+    const qrCanvas = this.rawQrDiv.querySelector('canvas');
+    const source =
+      knownSource || (qrImg && qrImg.complete && qrImg.naturalWidth ? qrImg : qrCanvas);
+    if (!source) return;
+    if (!knownSource && qrImg && !qrImg.complete) {
+      clearTimeout(this.tempoTimer);
+      this.tempoTimer = setTimeout(() => this._composite(templateId, fadeStrength), 60);
+      return;
+    }
+    // 'square' template = plain QR, skip the wash entirely.
+    const fade = templateId === 'square' ? 0 : fadeStrength;
+    this._drawFull(source);
+    if (fade > 0.01) this._washOutside(templateId, fade);
     this._restoreFinderPatterns(source);
   }
 
-  _drawMasked(source, templateId) {
+  /** Step 2: full-strength QR over a white background. */
+  _drawFull(source) {
+    const { ctx, canvas } = this;
+    const size = canvas.width;
+    ctx.clearRect(0, 0, size, size);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, size, size);
+    ctx.drawImage(source, 0, 0, size, size);
+  }
+
+  /**
+   * Step 3: translucent white over everything EXCEPT the silhouette.
+   * Uses an even-odd path (full rect + shape) so the fill lands only outside.
+   */
+  _washOutside(templateId, fadeStrength) {
     const { ctx, canvas } = this;
     const size = canvas.width;
     const cx = size / 2;
     const cy = size / 2;
     const template = TEMPLATE_OBJECTS[templateId] || TEMPLATE_OBJECTS.square;
 
-    ctx.clearRect(0, 0, size, size);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, size, size);
-
     ctx.save();
     ctx.beginPath();
+    ctx.rect(0, 0, size, size);
     template.draw(ctx, cx, cy, size);
     ctx.closePath();
-    ctx.clip();
-    ctx.drawImage(source, 0, 0, size, size);
+    // 'evenodd' => rect minus shape = outside region only.
+    ctx.clip('evenodd');
+    ctx.fillStyle = `rgba(255, 255, 255, ${fadeStrength})`;
+    ctx.fillRect(0, 0, size, size);
     ctx.restore();
   }
 
+  /** Step 4: finder anchors back at full contrast (independent src/dst scaling). */
   _restoreFinderPatterns(source) {
     const { ctx, canvas } = this;
     const size = canvas.width;
-    // Source dimensions (raw QR bitmap) vs destination (canvas) can differ.
     const srcW = source.naturalWidth || source.width;
     const srcH = source.naturalHeight || source.height;
     const frac = 0.28; // anchor covers ~28% of the edge

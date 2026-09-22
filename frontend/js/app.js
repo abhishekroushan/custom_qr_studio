@@ -17,6 +17,7 @@
 
   let currentTemplateId = 'heart';
   let currentInputTypeId = 'website';
+  let currentFade = 0.78;
   let fieldValues = {};
   let inputTypeList = null;
   let templateList = null;
@@ -24,6 +25,8 @@
   const typeSelect = document.getElementById('input-type-select');
   const fieldsBox = document.getElementById('dynamic-fields');
   const shapeGrid = document.getElementById('shape-grid');
+  const fadeSlider = document.getElementById('fade-slider');
+  const fadeValue = document.getElementById('fade-value');
   const downloadBtn = document.getElementById('download-btn');
   const canvas = document.getElementById('output-canvas');
   const rawQrDiv = document.getElementById('raw-qr');
@@ -129,7 +132,12 @@
     const errEl = document.getElementById('error-' + firstKey);
     if (errEl) errEl.textContent = error || '';
     // Render even when invalid (prototype did); validation message guides user.
-    renderer.render(def.buildPayload(fieldValues), currentTemplateId);
+    renderer.render(def.buildPayload(fieldValues), currentTemplateId, currentFade);
+  }
+
+  function refade() {
+    // Cheap path: reuses the cached raw QR, no matrix regeneration.
+    renderer.refade(currentTemplateId, currentFade);
   }
 
   async function init() {
@@ -155,6 +163,12 @@
       currentInputTypeId = typeSelect.value;
       renderFields();
       regenerate();
+    });
+
+    fadeSlider.addEventListener('input', () => {
+      currentFade = parseInt(fadeSlider.value, 10) / 100;
+      fadeValue.textContent = fadeSlider.value + '%';
+      refade();
     });
 
     downloadBtn.addEventListener('click', () => {
