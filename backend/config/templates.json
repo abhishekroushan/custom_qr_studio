@@ -1,0 +1,8 @@
+[
+  { "id": "heart", "name": "Heart", "icon": "♥", "enabled": true },
+  { "id": "star", "name": "Star", "icon": "★", "enabled": true },
+  { "id": "diamond", "name": "Diamond", "icon": "◆", "enabled": true },
+  { "id": "shield", "name": "Shield", "icon": "🛡", "enabled": true },
+  { "id": "circle", "name": "Circle", "icon": "●", "enabled": true },
+  { "id": "square", "name": "Full Block", "icon": "■", "enabled": true }
+]

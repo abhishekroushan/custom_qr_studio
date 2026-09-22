@@ -1,0 +1,28 @@
+[
+  {
+    "id": "website",
+    "label": "Website URL",
+    "enabled": true,
+    "fields": [
+      {
+        "key": "url",
+        "label": "Target URL",
+        "placeholder": "https://example.com",
+        "hint": "Scheme is added automatically if omitted (example.com → https://example.com)."
+      }
+    ]
+  },
+  {
+    "id": "text",
+    "label": "Plain Text",
+    "enabled": true,
+    "fields": [
+      {
+        "key": "text",
+        "label": "Text content",
+        "placeholder": "Hello, world!",
+        "hint": "Any short text — scanned as-is."
+      }
+    ]
+  }
+]

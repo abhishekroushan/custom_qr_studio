@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Shape Mask Studio</title>
+  <!-- QR matrix engine: generates the raw (square) QR with Level H error correction.
+       We then re-render it onto <canvas> through a template-object mask. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <h1 class="page-title">QR Shape Mask Studio</h1>
+  <p class="page-subtitle">Error-corrected silhouette masking matrix engine</p>
+
+  <div class="container">
+    <!-- ============ Controls (left) ============ -->
+    <div class="control-panel">
+
+      <!-- Input-type selector. Populated by app.js from backend /api/input-types,
+           with fallback to the local INPUT_TYPES registry in js/inputs.js.
+           Only "website" is fully wired today; add new types without touching HTML. -->
+      <div class="form-group">
+        <label for="input-type-select">Input Type</label>
+        <select id="input-type-select"></select>
+      </div>
+
+      <!-- Per-type fields are rendered here dynamically (see js/inputs.js).
+           For "website" this is a single URL field with auto-https normalization. -->
+      <div class="form-group" id="dynamic-fields"></div>
+
+      <!-- Template-object selector. Buttons are rendered by app.js from
+           backend /api/templates, drawing logic lives in js/templates.js.
+           To add a shape: add a JSON entry + a draw function, no HTML change. -->
+      <div class="form-group">
+        <label>Template Object</label>
+        <div class="shape-grid" id="shape-grid"></div>
+      </div>
+
+      <div class="form-group">
+        <button id="download-btn" class="download-btn" type="button">⬇ Download PNG</button>
+      </div>
+    </div>
+
+    <!-- ============ Preview (right) ============ -->
+    <div class="preview-panel">
+      <!-- Hidden node where qrcodejs paints its raw square QR (table/img).
+           We never show it; renderer.js reads the <img> pixels into the canvas. -->
+      <div id="raw-qr" aria-hidden="true"></div>
+      <canvas id="output-canvas" width="400" height="400"></canvas>
+      <div class="warning-text">
+        ⚠️ Level H (30%) Error Correction active. Corner position anchors remain
+        unmasked to preserve baseline hardware camera tracking.
+      </div>
+    </div>
+  </div>
+
+  <!-- Order matters: registries -> renderer -> app glue -->
+  <script src="js/inputs.js"></script>
+  <script src="js/templates.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
