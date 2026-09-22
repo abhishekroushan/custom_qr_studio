@@ -72,17 +72,31 @@ Each keystroke / shape click runs:
 
 1. **Raw QR generation** — `new QRCode(rawQrDiv, { text: payload, width: 256,
    height: 256, correctLevel: QRCode.CorrectLevel.H })`. Level H gives ~30%
-   data recovery, which is what allows cropping modules into a silhouette.
-2. **Canvas reset** — clear + fill white (QR scanners expect a light quiet zone).
-3. **Silhouette clip** — `ctx.beginPath()`, call
-   `TEMPLATE_OBJECTS[id].draw(ctx, cx, cy, size)` (Bézier/line/arc paths authored
-   for a 400px canvas, scaled by `size/400`), then `ctx.clip()`.
-4. **Masked blit** — `ctx.drawImage(rawQR, 0, 0, size, size)` inside the clip,
-   so only silhouette pixels survive; `ctx.restore()`.
-5. **Finder-pattern restore** — the 3 corner squares (top-left, top-right,
-   bottom-left) are stamped back **unclipped** at ~28% of the edge length, with
-   source/destination rectangles scaled independently (the prototype mixed these
-   scales, which this version fixes). Without this, cameras can't lock on.
+   data recovery as a safety net.
+2. **Full-strength base** — clear canvas, fill white, `drawImage()` the entire
+   QR at full contrast. No modules are ever deleted.
+3. **Outside-shape wash** — build an even-odd path (full-canvas rect + template
+   silhouette from `TEMPLATE_OBJECTS`), `clip('evenodd')`, then fill with
+   `rgba(255,255,255,fade)`. Inside-shape modules stay pure black; outside
+   modules turn light gray — visually receding but still decodable. The
+   **fade slider** (0–95%, default 78%) controls this live via the cheap
+   `renderer.refade()` path, which reuses the cached raw QR without
+   regenerating the matrix. `square` skips the wash (plain QR).
+4. **Finder-pattern restore** — the 3 corner squares (top-left, top-right,
+   bottom-left) are stamped back at full contrast with independent
+   source/destination scaling.
+
+Why fade instead of hard-clip? The original hard-clip deleted every module
+outside the heart/star path. Level H only recovers ~30% damage and a heart
+crop destroys far more — hence only "Full Block" scanned. Fade keeps 100% of
+modules and expresses the shape through contrast instead of deletion.
+
+Measured threshold (real phone camera, Heart template): scanning starts
+working at ~65–66% fade and passes reliably below 65%. In pixel terms, a 65%
+white wash turns black modules to gray ~166 — dimmer than that and decoders
+give up. The UI therefore defaults to 60% (headroom for other phones/lighting).
+Other shapes will have their own nearby thresholds; the slider max (95%) is
+kept for experimentation, not production use.
 
 ### Input templatizing (`js/inputs.js` + `backend/config/input-types.json`)
 
