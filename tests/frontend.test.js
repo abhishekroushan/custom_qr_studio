@@ -35,6 +35,7 @@ describe('index.html wiring', () => {
       'frontend/js/inputs.js',
       'frontend/js/templates.js',
       'frontend/js/palettes.js',
+      'frontend/js/extract.js',
       'frontend/js/renderer.js',
       'frontend/js/app.js',
     ]);

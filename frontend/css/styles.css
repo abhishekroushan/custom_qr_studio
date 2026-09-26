@@ -196,6 +196,57 @@ input[type="range"] {
   color: var(--muted);
 }
 
+/* Extract-from-image panel */
+.extract-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.extract-row input[type="text"] {
+  flex: 1;
+}
+
+.mini-btn {
+  background-color: var(--bg-primary);
+  border: 2px solid var(--border);
+  color: var(--input-text);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.mini-btn:hover { border-color: var(--accent); }
+
+.mini-btn.primary {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.inline-label {
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#extract-preview {
+  width: 200px;
+  height: 200px;
+}
+
+input[type="file"] {
+  color: var(--muted);
+  font-size: 0.875rem;
+  max-width: 100%;
+}
+
 /* Hidden raw QR engine landing node — never shown, only read as pixels */
 #raw-qr { display: none; }
 

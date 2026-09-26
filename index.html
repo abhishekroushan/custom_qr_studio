@@ -39,6 +39,36 @@
         <div class="shape-grid" id="shape-grid"></div>
       </div>
 
+      <!-- Custom image extraction panel (shown when "Extract from image" is
+           picked). URL fetch or file upload -> silhouette preview -> Apply.
+           Failures surface in #extract-error, never silently. -->
+      <div class="form-group" id="extract-panel" hidden>
+        <label>Extract silhouette from image</label>
+        <div class="extract-row">
+          <input type="text" id="extract-url" placeholder="https://example.com/logo.png" />
+          <button id="extract-fetch" class="mini-btn" type="button">Fetch</button>
+        </div>
+        <div class="extract-row">
+          <input type="file" id="extract-file" accept="image/*" />
+        </div>
+        <div class="extract-row">
+          <label class="inline-label" for="extract-threshold">Threshold: <span id="extract-threshold-value">128</span></label>
+          <input type="range" id="extract-threshold" min="0" max="255" value="128" step="1" />
+        </div>
+        <div class="extract-row">
+          <label class="inline-label"><input type="checkbox" id="extract-invert" /> Invert silhouette</label>
+        </div>
+        <div class="extract-row">
+          <canvas id="extract-preview" width="200" height="200"></canvas>
+        </div>
+        <div class="field-hint" id="extract-source-hint">Transparent PNGs use the alpha channel; other images use the threshold.</div>
+        <div class="field-error" id="extract-error"></div>
+        <div class="extract-row">
+          <button id="extract-apply" class="mini-btn primary" type="button">Apply silhouette</button>
+          <button id="extract-cancel" class="mini-btn" type="button">Cancel</button>
+        </div>
+      </div>
+
       <!-- Fade strength: how strongly modules outside the silhouette are
            washed out. 0 = plain square QR, 0.50 default (safe middle ground;
            short URLs scan up to ~0.65, dense URLs need ≤0.50).
@@ -82,6 +112,7 @@
   <script src="frontend/js/inputs.js"></script>
   <script src="frontend/js/templates.js"></script>
   <script src="frontend/js/palettes.js"></script>
+  <script src="frontend/js/extract.js"></script>
   <script src="frontend/js/renderer.js"></script>
   <script src="frontend/js/app.js"></script>
 </body>
