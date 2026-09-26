@@ -63,13 +63,16 @@ describe('index.html wiring', () => {
     assert.ok(hintAt > toolbarAt && hintAt < panelAt, 'ACP hint between toolbar and window');
   });
 
-  it('extract section is separate from the shape grid, collapsed by default', () => {
-    const gridAt = html.indexOf('id="shape-grid"');
-    const sectionAt = html.indexOf('id="extract-section"');
-    assert.ok(sectionAt > gridAt, 'extract section follows the shape grid');
-    assert.ok(html.includes('id="extract-toggle"'), 'section has a toggle');
-    assert.ok(html.includes('id="extract-panel" hidden'), 'panel starts collapsed');
-    assert.ok(!html.includes('data-shape="custom"'), 'no custom button baked into markup');
+  it('extract flow lives in a modal dialog, not inline', () => {
+    const toggleAt = html.indexOf('id="extract-toggle"');
+    const dialogAt = html.indexOf('id="extract-dialog"');
+    const dialogCloseAt = html.indexOf('</dialog>');
+    const panelAt = html.indexOf('id="extract-panel"');
+    assert.ok(toggleAt !== -1 && dialogAt > toggleAt, 'toggle precedes the dialog');
+    assert.ok(panelAt > dialogAt && panelAt < dialogCloseAt, 'panel lives inside the dialog');
+    assert.ok(html.includes('aria-labelledby="extract-title"'), 'dialog is labelled');
+    assert.ok(html.includes('id="extract-close"'), 'dialog has a close button');
+    assert.ok(!html.includes('id="extract-panel" hidden'), 'no inline collapsed panel');
   });
 });
 

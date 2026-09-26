@@ -36,9 +36,10 @@
   const shapeGrid = document.getElementById('shape-grid');
   const paletteSelect = document.getElementById('palette-select');
   const extractPanel = document.getElementById('extract-panel');
+  const extractDialog = document.getElementById('extract-dialog');
   const extractToggle = document.getElementById('extract-toggle');
   const extractStatus = document.getElementById('extract-status');
-  const extractChevron = document.getElementById('extract-chevron');
+  const extractClose = document.getElementById('extract-close');
   const extractUrl = document.getElementById('extract-url');
   const extractFetch = document.getElementById('extract-fetch');
   const extractFile = document.getElementById('extract-file');
@@ -206,21 +207,14 @@
   /* ---------- Extract-from-image panel ---------- */
 
   function showExtractPanel() {
-    extractPanel.hidden = false;
-    extractToggle.setAttribute('aria-expanded', 'true');
-    extractChevron.textContent = '▾';
-    extractPanel.scrollIntoView({ block: 'nearest' });
+    // Native modal: backdrop, Esc, and focus return come free. Guarded since
+    // showModal() throws when the dialog is already open.
+    if (!extractDialog.open) extractDialog.showModal();
+    extractUrl.focus();
   }
 
   function hideExtractPanel() {
-    extractPanel.hidden = true;
-    extractToggle.setAttribute('aria-expanded', 'false');
-    extractChevron.textContent = '▸';
-  }
-
-  function toggleExtractPanel() {
-    if (extractPanel.hidden) showExtractPanel();
-    else hideExtractPanel();
+    if (extractDialog.open) extractDialog.close();
   }
 
   function setExtractError(err) {
@@ -368,7 +362,12 @@
     extractInvert.addEventListener('change', refreshExtractPreview);
     extractApply.addEventListener('click', applyExtract);
     extractCancel.addEventListener('click', hideExtractPanel);
-    extractToggle.addEventListener('click', toggleExtractPanel);
+    extractClose.addEventListener('click', hideExtractPanel);
+    extractToggle.addEventListener('click', showExtractPanel);
+    // Backdrop click closes (state persists in the live DOM nodes).
+    extractDialog.addEventListener('click', (e) => {
+      if (e.target === extractDialog) hideExtractPanel();
+    });
 
     downloadBtn.addEventListener('click', () => {
       const a = document.createElement('a');

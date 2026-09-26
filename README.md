@@ -131,10 +131,12 @@ inset 5%). Backend JSON controls the button list/order.
 
 ### Custom image extraction (`js/extract.js`)
 
-Below the six shapes sits a separate collapsible section, "Use your own
-image…" — the alternative path for when no built-in shape fits. It accepts
-an **image URL** (Fetch; pasted `data:image/...` blobs work too) or a **local
-file upload**. The pipeline:
+Below the six shapes sits a separate toggle, "Use your own image…" — the
+alternative path for when no built-in shape fits. It opens a **modal dialog**
+(native `<dialog>`: free backdrop, Esc-to-close, focus return, zero page
+layout shift — the QR preview never moves). Inside: an **image URL** field
+(Fetch; pasted `data:image/...` blobs work too) or a **local file upload**.
+Closing without applying loses nothing; panel state persists. The pipeline:
 
 1. **Load** — uploads read locally (no restrictions); pasted `data:image/...`
    blobs decode locally too (never taint canvas); remote URL fetches request
