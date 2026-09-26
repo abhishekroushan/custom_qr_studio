@@ -1,16 +1,16 @@
-/* Default theme = pastel-colorblind (see js/palettes.js). app.js re-applies the
+/* Default theme = abyss (see js/palettes.js). app.js re-applies the
    stored/selected palette on boot; these :root values define the first paint
    and the file:// fallback before JS runs. */
 :root {
-  --bg-primary: #f4efe3;
-  --bg-secondary: #fdfcf8;
-  --accent: #0072b2;
-  --text: #1f2933;
-  --muted: #5b6b7a;
-  --border: #d8d2c0;
-  --input-text: #1f2933;
-  --on-accent: #ffffff;
-  --error: #b00020;
+  --bg-primary: #0b1220;
+  --bg-secondary: #131c2e;
+  --accent: #22d3ee;
+  --text: #f1f5f9;
+  --muted: #8fa0b3;
+  --border: #243145;
+  --input-text: #ffffff;
+  --on-accent: #06202a;
+  --error: #ff8a80;
 }
 
 body {

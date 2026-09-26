@@ -1,8 +1,14 @@
 [
   {
+    "id": "abyss",
+    "name": "Abyss (color-blind safe)",
+    "description": "Default. Deep-sea dark theme with a vivid cyan accent.",
+    "enabled": true
+  },
+  {
     "id": "pastel-colorblind",
     "name": "Pastel (color-blind safe)",
-    "description": "Default. Soft parchment surfaces with an Okabe-Ito blue accent.",
+    "description": "Soft parchment surfaces with an Okabe-Ito blue accent.",
     "enabled": true
   },
   {

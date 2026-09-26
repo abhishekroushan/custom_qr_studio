@@ -23,13 +23,30 @@
  * renders black-on-white regardless of palette, to protect scannability.
  */
 
-const DEFAULT_PALETTE = 'pastel-colorblind';
+const DEFAULT_PALETTE = 'abyss';
 
 const PALETTES = {
+  abyss: {
+    id: 'abyss',
+    name: 'Abyss (color-blind safe)',
+    description: 'Default. Deep-sea dark theme with a vivid cyan accent.',
+    colors: {
+      '--bg-primary': '#0b1220',
+      '--bg-secondary': '#131c2e',
+      '--accent': '#22d3ee',
+      '--text': '#f1f5f9',
+      '--muted': '#8fa0b3',
+      '--border': '#243145',
+      '--input-text': '#ffffff',
+      '--on-accent': '#06202a',
+      '--error': '#ff8a80',
+    },
+  },
+
   'pastel-colorblind': {
     id: 'pastel-colorblind',
     name: 'Pastel (color-blind safe)',
-    description: 'Default. Soft parchment surfaces with an Okabe-Ito blue accent.',
+    description: 'Soft parchment surfaces with an Okabe-Ito blue accent.',
     colors: {
       '--bg-primary': '#f4efe3',
       '--bg-secondary': '#fdfcf8',
