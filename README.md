@@ -169,6 +169,23 @@ npx serve .
 ```
 Same fallback behavior as Pages.
 
+## Tests
+
+```
+npm test
+```
+
+`tests/` runs on Node's built-in runner — no extra dependencies:
+
+| File | What it covers |
+|---|---|
+| `config.test.js` | Backend JSON parses; schema + id uniqueness for input-types, templates, palettes |
+| `registries.test.js` | Frontend/backend id sync; URL normalize+validate, text type, shape `draw()` smoke tests, palette application |
+| `renderer.test.js` | QR pipeline with a mocked canvas: Level-H generation, even-odd wash at the right strength, square bypass, corner anchors, `refade()` reuse |
+| `frontend.test.js` | index.html/app.js wiring (element ids, script order, API contract) and shared defaults (fade 0.50, abyss `:root`, Wikipedia URL) |
+| `server.test.js` | Live HTTP: health, config endpoints, root page, `/frontend/*` + legacy assets |
+| `accessibility.test.js` | WCAG AA contrast per palette; white QR base; 65%-fade threshold math |
+
 ## Extending
 
 - **New input type** (e.g. Wi-Fi): add implementation to
