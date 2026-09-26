@@ -40,7 +40,7 @@ The page has two columns inside `.container`:
      from `GET /api/input-types` (fallback: `INPUT_TYPES` in `inputs.js`).
    - `<div id="dynamic-fields">` — empty in the HTML; `app.js` renders one
      `<input>` per field of the selected input type. For `website` this is a
-     single "Target URL" box defaulting to `https://barkod.studio`.
+     single "Target URL" box defaulting to `https://en.wikipedia.org/wiki/Main_Page`.
    - `<div id="shape-grid">` — empty in the HTML; `app.js` renders one button
      per entry from `GET /api/templates` (fallback: `TEMPLATE_OBJECTS`).
    - Download button — exports the visible canvas as PNG via

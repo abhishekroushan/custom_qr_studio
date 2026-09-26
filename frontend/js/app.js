@@ -77,7 +77,7 @@
       input.id = 'field-' + f.key;
       input.placeholder = f.placeholder || '';
       if (currentInputTypeId === 'website' && f.key === 'url') {
-        input.value = 'https://barkod.studio';
+        input.value = 'https://en.wikipedia.org/wiki/Main_Page';
       }
       input.addEventListener('input', () => {
         fieldValues[f.key] = input.value;
