@@ -190,6 +190,12 @@ input[type="range"] {
   font-size: 0.875rem;
 }
 
+.palette-hint {
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
 /* Hidden raw QR engine landing node — never shown, only read as pixels */
 #raw-qr { display: none; }
 

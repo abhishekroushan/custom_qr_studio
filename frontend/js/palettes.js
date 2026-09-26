@@ -28,7 +28,7 @@ const DEFAULT_PALETTE = 'abyss';
 const PALETTES = {
   abyss: {
     id: 'abyss',
-    name: 'Abyss (color-blind safe)',
+    name: 'Abyss (ACP)',
     description: 'Default. Deep-sea dark theme with a vivid cyan accent.',
     colors: {
       '--bg-primary': '#0b1220',
@@ -45,7 +45,7 @@ const PALETTES = {
 
   'pastel-colorblind': {
     id: 'pastel-colorblind',
-    name: 'Pastel (color-blind safe)',
+    name: 'Pastel (ACP)',
     description: 'Soft parchment surfaces with an Okabe-Ito blue accent.',
     colors: {
       '--bg-primary': '#f4efe3',

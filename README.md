@@ -130,7 +130,7 @@ inset 5%). Backend JSON controls the button list/order.
 
 ### Color palettes (`js/palettes.js` + `backend/config/palettes.json`)
 
-All page colors flow through 9 CSS variables (`--bg-primary`, `--bg-secondary`,
+ACP = accessible color palette. All page colors flow through 9 CSS variables (`--bg-primary`, `--bg-secondary`,
 `--accent`, `--text`, `--muted`, `--border`, `--input-text`, `--on-accent`,
 `--error`). Each palette supplies all 9; `applyPalette(id)` sets them on
 `:root`. The QR matrix itself always renders black-on-white regardless of
@@ -139,8 +139,8 @@ palette, to protect scannability. The selector choice persists in
 
 | Palette | Look | Notes |
 |---|---|---|
-| Abyss (color-blind safe) — **default** | Deep-sea ink `#0b1220`, vivid cyan `#22d3ee` accent | Blue/cyan axis stays distinguishable under all common color-vision deficiencies; dark ground lets the accent stay vivid instead of washing out like pastels |
-| Pastel (color-blind safe) | Soft parchment `#f4efe3`, Okabe-Ito blue `#0072b2` accent | Same safety reasoning in a light, low-saturation flavor; errors always pair color with text |
+| Abyss (ACP) — **default** | Deep-sea ink `#0b1220`, vivid cyan `#22d3ee` accent | Blue/cyan axis stays distinguishable under all common color-vision deficiencies; dark ground lets the accent stay vivid instead of washing out like pastels |
+| Pastel (ACP) | Soft parchment `#f4efe3`, Okabe-Ito blue `#0072b2` accent | Same safety reasoning in a light, low-saturation flavor; errors always pair color with text |
 | Day | Light slate + sky-blue accent | Neutral light mode |
 | High contrast | Black/white + yellow `#ffd500` accent, white borders | Maximum legibility; muted text kept at `#d4d4d4` so it still passes contrast |
 
