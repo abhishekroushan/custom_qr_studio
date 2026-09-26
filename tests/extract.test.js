@@ -119,6 +119,30 @@ describe('extractMask', () => {
   });
 });
 
+describe('classifyImageSource', () => {
+  it('accepts data:image URLs (copy-image-address pastes)', () => {
+    const src = 'data:image/jpeg;base64,/9j/4AAQSkZJRgAB';
+    // Field-wise compare: objects built inside the VM carry another realm's prototype.
+    const r = run('classifyImageSource(s)', { s: src });
+    assert.equal(r.kind, 'data-url');
+    assert.equal(r.src, src);
+    const png = 'data:image/png;base64,iVBORw0KGgo=';
+    assert.equal(run('classifyImageSource(s)', { s: png }).kind, 'data-url');
+  });
+
+  it('accepts http(s) URLs', () => {
+    const r = run("classifyImageSource('https://example.com/a.png')");
+    assert.equal(r.kind, 'http-url');
+    assert.equal(r.src, 'https://example.com/a.png');
+  });
+
+  it('rejects non-image data URLs and bad URLs', () => {
+    for (const bad of ['', 'not a url', 'ftp://example.com/a.png', 'data:text/plain;base64,aGk=', 'data:image/pngnotbase64,xxx']) {
+      assert.throws(() => run('classifyImageSource(s)', { s: bad }), `rejects ${JSON.stringify(bad).slice(0, 40)}`);
+    }
+  });
+});
+
 describe('validateImageUrl + extractErrorMessage', () => {
   it('accepts http(s), rejects the rest', () => {
     assert.equal(run("validateImageUrl('https://example.com/a.png')"), 'https://example.com/a.png');

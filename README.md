@@ -136,8 +136,9 @@ a bitmap produced by `extract.js` (see below).
 The "Extract from image" button (below the six shapes) opens a panel accepting
 an **image URL** (Fetch) or a **local file upload**. The pipeline:
 
-1. **Load** — uploads read locally (no restrictions); URL fetches request CORS
-   (`crossOrigin="anonymous"`), since pixel readout needs it.
+1. **Load** — uploads read locally (no restrictions); pasted `data:image/...`
+   blobs decode locally too (never taint canvas); remote URL fetches request
+   CORS (`crossOrigin="anonymous"`), since pixel readout needs it.
 2. **Extract** — transparent PNGs use the **alpha channel** directly (exact
    silhouette); other images use a **luminance threshold** (dark = object) with
    a live slider + invert toggle and a black-on-white preview.

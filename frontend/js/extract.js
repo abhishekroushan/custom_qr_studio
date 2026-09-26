@@ -104,12 +104,34 @@ function validateImageUrl(raw) {
 }
 
 /**
- * Load an image element from a File (upload, no CORS limits) or a URL string
- * (needs CORS-enabled host for later pixel reads — enforced at read time).
+ * Pure classifier for the three accepted inputs (unit-tested).
+ * @returns {{ kind: 'file' }} for uploads (no CORS limits),
+ *   {{ kind: 'data-url', src }} for pasted data:image/... blobs (never taint),
+ *   {{ kind: 'http-url', src }} for remote URLs (need CORS for pixel reads).
+ * @throws {{ code: 'invalid-url' }} for everything else.
+ */
+function classifyImageSource(input) {
+  if (typeof File !== 'undefined' && input instanceof File) return { kind: 'file' };
+  const s = (typeof input === 'string' ? input : '').trim();
+  if (/^data:image\/[a-z0-9.+-]+;base64,/i.test(s)) return { kind: 'data-url', src: s };
+  return { kind: 'http-url', src: validateImageUrl(s) };
+}
+
+/**
+ * Load an image element from a File (upload, no CORS limits), a pasted
+ * data:image/... URL (decodes locally, never taints), or a remote URL string
+ * (needs a CORS-enabled host for later pixel reads — enforced at read time).
  * Rejects with { code: 'load-failed' } when the bytes can't be decoded.
  */
 function loadImageElement(input) {
   return new Promise((resolve, reject) => {
+    let source;
+    try {
+      source = classifyImageSource(input);
+    } catch (err) {
+      reject(err);
+      return;
+    }
     const img = new Image();
     let objectUrl = null;
     img.onload = () => {
@@ -120,12 +142,13 @@ function loadImageElement(input) {
       if (objectUrl) URL.revokeObjectURL(objectUrl);
       reject({ code: 'load-failed' });
     };
-    if (typeof File !== 'undefined' && input instanceof File) {
+    if (source.kind === 'file') {
       objectUrl = URL.createObjectURL(input);
       img.src = objectUrl;
     } else {
-      img.crossOrigin = 'anonymous';
-      img.src = validateImageUrl(input);
+      // CORS is only meaningful (and only required) for remote http(s) URLs.
+      if (source.kind === 'http-url') img.crossOrigin = 'anonymous';
+      img.src = source.src;
     }
   });
 }
@@ -136,6 +159,8 @@ function loadImageElement(input) {
  * or { code: 'empty-mask', result } when nothing usable was found.
  */
 function imageToMaskResult(img, { threshold = 128, invert = false } = {}) {
+  // SVGs without intrinsic dimensions (and broken decodes) report 0 here.
+  if (!img.naturalWidth || !img.naturalHeight) throw { code: 'load-failed' };
   const c = document.createElement('canvas');
   c.width = EXTRACT_SIZE;
   c.height = EXTRACT_SIZE;
@@ -159,7 +184,7 @@ function imageToMaskResult(img, { threshold = 128, invert = false } = {}) {
 function extractErrorMessage(err) {
   switch (err && err.code) {
     case 'invalid-url':
-      return 'Enter an http(s) image URL or upload a file instead.';
+      return 'Enter an image URL (http(s) or pasted data:image), or upload a file instead.';
     case 'load-failed':
       return 'Could not load that image. Check the URL or upload the file instead.';
     case 'cors-tainted':
