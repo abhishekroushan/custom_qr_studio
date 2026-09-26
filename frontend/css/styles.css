@@ -1,10 +1,16 @@
+/* Default theme = pastel-colorblind (see js/palettes.js). app.js re-applies the
+   stored/selected palette on boot; these :root values define the first paint
+   and the file:// fallback before JS runs. */
 :root {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --accent: #38bdf8;
-  --text: #f8fafc;
-  --muted: #94a3b8;
-  --border: #334155;
+  --bg-primary: #f4efe3;
+  --bg-secondary: #fdfcf8;
+  --accent: #0072b2;
+  --text: #1f2933;
+  --muted: #5b6b7a;
+  --border: #d8d2c0;
+  --input-text: #1f2933;
+  --on-accent: #ffffff;
+  --error: #b00020;
 }
 
 body {
@@ -65,12 +71,18 @@ select {
   border: 2px solid var(--border);
   border-radius: 0.5rem;
   padding: 0.75rem;
-  color: white;
+  color: var(--input-text);
   font-size: 1rem;
   outline: none;
   transition: border-color 0.2s;
   width: 100%;
   box-sizing: border-box;
+}
+
+/* Native dropdown list readability on dark palettes */
+select option {
+  background-color: var(--bg-secondary);
+  color: var(--input-text);
 }
 
 input[type="text"]:focus,
@@ -97,7 +109,7 @@ input[type="range"] {
 
 .field-error {
   font-size: 0.75rem;
-  color: #f87171;
+  color: var(--error);
   min-height: 1rem;
 }
 
@@ -110,7 +122,7 @@ input[type="range"] {
 .shape-btn {
   background-color: var(--bg-primary);
   border: 2px solid var(--border);
-  color: white;
+  color: var(--input-text);
   padding: 0.75rem;
   border-radius: 0.5rem;
   cursor: pointer;
@@ -118,19 +130,19 @@ input[type="range"] {
   transition: all 0.2s;
 }
 
-.shape-btn:hover { border-color: #475569; }
+.shape-btn:hover { border-color: var(--accent); }
 
 .shape-btn.active {
   background-color: var(--accent);
   border-color: var(--accent);
-  color: var(--bg-primary);
+  color: var(--on-accent);
   font-weight: bold;
 }
 
 .download-btn {
   background-color: var(--accent);
   border: none;
-  color: var(--bg-primary);
+  color: var(--on-accent);
   padding: 0.75rem;
   border-radius: 0.5rem;
   cursor: pointer;

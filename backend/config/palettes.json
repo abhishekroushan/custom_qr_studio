@@ -1,0 +1,26 @@
+[
+  {
+    "id": "pastel-colorblind",
+    "name": "Pastel (color-blind safe)",
+    "description": "Default. Soft parchment surfaces with an Okabe-Ito blue accent.",
+    "enabled": true
+  },
+  {
+    "id": "day",
+    "name": "Day",
+    "description": "Neutral light theme with a sky-blue accent.",
+    "enabled": true
+  },
+  {
+    "id": "night",
+    "name": "Night",
+    "description": "The original dark slate theme.",
+    "enabled": true
+  },
+  {
+    "id": "high-contrast",
+    "name": "High contrast",
+    "description": "Black/white with a yellow accent. Maximum legibility.",
+    "enabled": true
+  }
+]

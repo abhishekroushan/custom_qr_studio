@@ -49,6 +49,14 @@
         <div class="field-hint">Lower = easier to scan. 50% default suits long URLs; short ones tolerate up to ~65%.</div>
       </div>
 
+      <!-- Display palette. Options rendered by app.js from /api/palettes
+           (fallback: PALETTES in js/palettes.js); applied as CSS variables.
+           Choice persists in localStorage. -->
+      <div class="form-group">
+        <label for="palette-select">Color Palette</label>
+        <select id="palette-select"></select>
+      </div>
+
       <div class="form-group">
         <button id="download-btn" class="download-btn" type="button">⬇ Download PNG</button>
       </div>
@@ -71,6 +79,7 @@
   <!-- Order matters: registries -> renderer -> app glue -->
   <script src="frontend/js/inputs.js"></script>
   <script src="frontend/js/templates.js"></script>
+  <script src="frontend/js/palettes.js"></script>
   <script src="frontend/js/renderer.js"></script>
   <script src="frontend/js/app.js"></script>
 </body>

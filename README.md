@@ -18,6 +18,7 @@ Derived from `prototype.md` (single-file prototype), refactored into a modular
 │   └── js/
 │       ├── inputs.js           # INPUT_TYPES registry — what can become a QR
 │       ├── templates.js        # TEMPLATE_OBJECTS registry — overlay shapes
+│       ├── palettes.js         # PALETTES registry — page color configurations
 │       ├── renderer.js         # QRShapeRenderer: QR → fade wash → finder fix
 │       └── app.js              # glue: config fetch, dynamic form, events
 ├── backend/
@@ -25,7 +26,8 @@ Derived from `prototype.md` (single-file prototype), refactored into a modular
 │   ├── package.json
 │   └── config/
 │       ├── input-types.json    # which input types are enabled + field metadata
-│       └── templates.json      # which template objects are enabled + order
+│       ├── templates.json      # which template objects are enabled + order
+│       └── palettes.json       # which color palettes are enabled + order
 └── README.md
 ```
 
@@ -43,6 +45,11 @@ The page has two columns inside `.container`:
      single "Target URL" box defaulting to `https://en.wikipedia.org/wiki/Main_Page`.
    - `<div id="shape-grid">` — empty in the HTML; `app.js` renders one button
      per entry from `GET /api/templates` (fallback: `TEMPLATE_OBJECTS`).
+   - Fade slider — outside-shape wash strength, applied live via
+     `renderer.refade()` without regenerating the QR matrix.
+   - `<select id="palette-select">` — empty in the HTML; `app.js` fills it
+     from `GET /api/palettes` (fallback: `PALETTES`), applies the choice as
+     CSS variables, and persists it in `localStorage`.
    - Download button — exports the visible canvas as PNG via
      `canvas.toDataURL('image/png')`.
 
@@ -118,6 +125,22 @@ from the prototype paths: `heart` (cubic Béziers), `star` (5-spike polar loop),
 `diamond` (4 lines), `shield` (quadratics), `circle` (`arc`), `square` (`rect`
 inset 5%). Backend JSON controls the button list/order.
 
+### Color palettes (`js/palettes.js` + `backend/config/palettes.json`)
+
+All page colors flow through 9 CSS variables (`--bg-primary`, `--bg-secondary`,
+`--accent`, `--text`, `--muted`, `--border`, `--input-text`, `--on-accent`,
+`--error`). Each palette supplies all 9; `applyPalette(id)` sets them on
+`:root`. The QR matrix itself always renders black-on-white regardless of
+palette, to protect scannability. The selector choice persists in
+`localStorage` (`qr-studio-palette`).
+
+| Palette | Look | Notes |
+|---|---|---|
+| Pastel (color-blind safe) — **default** | Soft parchment `#f4efe3`, Okabe-Ito blue `#0072b2` accent | Accents stay distinguishable under deuteranopia/protanopia/tritanopia; errors always pair color with text |
+| Day | Light slate + sky-blue accent | Neutral light mode |
+| Night | Dark slate `#0f172a` + `#38bdf8` | The original prototype theme |
+| High contrast | Black/white + yellow `#ffd500` accent, white borders | Maximum legibility; muted text kept at `#d4d4d4` so it still passes contrast |
+
 ## Run it
 
 **Option A — with backend (recommended for local dev):**
@@ -151,3 +174,6 @@ Same fallback behavior as Pages.
 - **New template object** (e.g. cat): add `draw()` path to
   `frontend/js/templates.js` (`TEMPLATE_OBJECTS.cat = {...}`) + entry to
   `backend/config/templates.json`. Nothing else changes.
+- **New color palette** (e.g. brand theme): add all 9 color variables to
+  `frontend/js/palettes.js` (`PALETTES.brand = {...}`) + entry to
+  `backend/config/palettes.json`. Nothing else changes.

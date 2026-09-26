@@ -39,6 +39,10 @@ app.get('/api/templates', (req, res) => {
   res.json(loadJson('templates.json'));
 });
 
+app.get('/api/palettes', (req, res) => {
+  res.json(loadJson('palettes.json'));
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
