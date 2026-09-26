@@ -1,10 +1,16 @@
+/* Default theme = abyss (see js/palettes.js). app.js re-applies the
+   stored/selected palette on boot; these :root values define the first paint
+   and the file:// fallback before JS runs. */
 :root {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --accent: #38bdf8;
-  --text: #f8fafc;
-  --muted: #94a3b8;
-  --border: #334155;
+  --bg-primary: #0b1220;
+  --bg-secondary: #131c2e;
+  --accent: #22d3ee;
+  --text: #f1f5f9;
+  --muted: #8fa0b3;
+  --border: #243145;
+  --input-text: #ffffff;
+  --on-accent: #06202a;
+  --error: #ff8a80;
 }
 
 body {
@@ -65,12 +71,18 @@ select {
   border: 2px solid var(--border);
   border-radius: 0.5rem;
   padding: 0.75rem;
-  color: white;
+  color: var(--input-text);
   font-size: 1rem;
   outline: none;
   transition: border-color 0.2s;
   width: 100%;
   box-sizing: border-box;
+}
+
+/* Native dropdown list readability on dark palettes */
+select option {
+  background-color: var(--bg-secondary);
+  color: var(--input-text);
 }
 
 input[type="text"]:focus,
@@ -97,7 +109,7 @@ input[type="range"] {
 
 .field-error {
   font-size: 0.75rem;
-  color: #f87171;
+  color: var(--error);
   min-height: 1rem;
 }
 
@@ -110,7 +122,7 @@ input[type="range"] {
 .shape-btn {
   background-color: var(--bg-primary);
   border: 2px solid var(--border);
-  color: white;
+  color: var(--input-text);
   padding: 0.75rem;
   border-radius: 0.5rem;
   cursor: pointer;
@@ -118,19 +130,19 @@ input[type="range"] {
   transition: all 0.2s;
 }
 
-.shape-btn:hover { border-color: #475569; }
+.shape-btn:hover { border-color: var(--accent); }
 
 .shape-btn.active {
   background-color: var(--accent);
   border-color: var(--accent);
-  color: var(--bg-primary);
+  color: var(--on-accent);
   font-weight: bold;
 }
 
 .download-btn {
   background-color: var(--accent);
   border: none;
-  color: var(--bg-primary);
+  color: var(--on-accent);
   padding: 0.75rem;
   border-radius: 0.5rem;
   cursor: pointer;
@@ -149,6 +161,39 @@ input[type="range"] {
   border-radius: 0.5rem;
   padding: 2rem;
   position: relative;
+}
+
+/* Right column: toolbar row sits above (not inside) the preview window */
+.preview-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.preview-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.preview-toolbar label {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.preview-toolbar select {
+  width: auto;
+  min-width: 220px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.palette-hint {
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--muted);
 }
 
 /* Hidden raw QR engine landing node — never shown, only read as pixels */

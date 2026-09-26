@@ -1,13 +1,13 @@
 /**
- * app.js — glue between registries (inputs.js, templates.js), the renderer,
- * and the optional backend config API.
+ * app.js — glue between registries (inputs.js, templates.js, palettes.js),
+ * the renderer, and the optional backend config API.
  *
  * Startup:
- *   1. Try GET /api/input-types and /api/templates (backend lists).
- *      Fall back to the local INPUT_TYPES / TEMPLATE_OBJECTS registries
- *      so index.html also works opened directly (file://) with no server.
- *   2. Render the input-type <select>, the dynamic fields, and the
- *      template-object buttons.
+ *   1. Try GET /api/input-types, /api/templates, /api/palettes (backend lists).
+ *      Fall back to the local INPUT_TYPES / TEMPLATE_OBJECTS / PALETTES
+ *      registries so index.html also works opened directly (file://).
+ *   2. Render the input-type <select>, the dynamic fields, the
+ *      template-object buttons, and the palette <select> (stored choice wins).
  *   3. On any keystroke / selection change: validate -> buildPayload ->
  *      renderer.render(payload, templateId).
  */
@@ -15,16 +15,21 @@
 (function () {
   'use strict';
 
+  const PALETTE_STORAGE_KEY = 'qr-studio-palette';
+
   let currentTemplateId = 'heart';
   let currentInputTypeId = 'website';
-  let currentFade = 0.60;
+  let currentPaletteId = DEFAULT_PALETTE;
+  let currentFade = 0.50;
   let fieldValues = {};
   let inputTypeList = null;
   let templateList = null;
+  let paletteList = null;
 
   const typeSelect = document.getElementById('input-type-select');
   const fieldsBox = document.getElementById('dynamic-fields');
   const shapeGrid = document.getElementById('shape-grid');
+  const paletteSelect = document.getElementById('palette-select');
   const fadeSlider = document.getElementById('fade-slider');
   const fadeValue = document.getElementById('fade-value');
   const downloadBtn = document.getElementById('download-btn');
@@ -77,7 +82,7 @@
       input.id = 'field-' + f.key;
       input.placeholder = f.placeholder || '';
       if (currentInputTypeId === 'website' && f.key === 'url') {
-        input.value = 'https://barkod.studio';
+        input.value = 'https://en.wikipedia.org/wiki/Main_Page';
       }
       input.addEventListener('input', () => {
         fieldValues[f.key] = input.value;
@@ -116,6 +121,33 @@
     }
   }
 
+  function renderPaletteSelect() {
+    paletteSelect.innerHTML = '';
+    const palettes = paletteList || Object.values(PALETTES);
+    for (const p of palettes) {
+      if (!PALETTES[p.id]) continue; // backend advertises, frontend implements
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = p.name || PALETTES[p.id].name;
+      if (PALETTES[p.id].description) opt.title = PALETTES[p.id].description;
+      paletteSelect.appendChild(opt);
+    }
+    paletteSelect.value = currentPaletteId;
+  }
+
+  function setPalette(id, persist = true) {
+    if (!applyPalette(id)) return;
+    currentPaletteId = id;
+    paletteSelect.value = id;
+    if (persist) {
+      try {
+        localStorage.setItem(PALETTE_STORAGE_KEY, id);
+      } catch {
+        // private mode etc. — palette still applies for this session
+      }
+    }
+  }
+
   // Called by shape buttons (replaces prototype's inline onclick="setShape(...)").
   function setShape(shapeId) {
     currentTemplateId = shapeId;
@@ -141,10 +173,11 @@
   }
 
   async function init() {
-    // Backend is the source of truth for *which* types/templates are enabled
-    // and in what order; frontend registries provide the implementation.
+    // Backend is the source of truth for *which* types/templates/palettes are
+    // enabled and in what order; frontend registries provide the implementation.
     inputTypeList = await fetchConfig('/api/input-types');
     templateList = await fetchConfig('/api/templates');
+    paletteList = await fetchConfig('/api/palettes');
 
     if (inputTypeList && inputTypeList.length) {
       const firstKnown = inputTypeList.find((t) => INPUT_TYPES[t.id]);
@@ -155,9 +188,31 @@
       if (firstKnown) currentTemplateId = firstKnown.id;
     }
 
+    // Palette: stored choice wins, then backend/default.
+    let storedPalette = null;
+    try {
+      storedPalette = localStorage.getItem(PALETTE_STORAGE_KEY);
+    } catch {
+      storedPalette = null;
+    }
+    const enabledPalettes = paletteList || Object.values(PALETTES);
+    const firstPalette = enabledPalettes.find((p) => PALETTES[p.id]);
+    if (storedPalette && PALETTES[storedPalette] &&
+        enabledPalettes.some((p) => p.id === storedPalette)) {
+      currentPaletteId = storedPalette;
+    } else if (firstPalette) {
+      currentPaletteId = firstPalette.id;
+    } else {
+      currentPaletteId = DEFAULT_PALETTE;
+    }
+
     renderTypeSelect();
     renderFields();
     renderShapeGrid();
+    renderPaletteSelect();
+    setPalette(currentPaletteId, false);
+
+    paletteSelect.addEventListener('change', () => setPalette(paletteSelect.value));
 
     typeSelect.addEventListener('change', () => {
       currentInputTypeId = typeSelect.value;

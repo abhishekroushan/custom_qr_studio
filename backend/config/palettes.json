@@ -1,0 +1,26 @@
+[
+  {
+    "id": "abyss",
+    "name": "Abyss (ACP)",
+    "description": "Default. Deep-sea dark theme with a vivid cyan accent.",
+    "enabled": true
+  },
+  {
+    "id": "pastel-colorblind",
+    "name": "Pastel (ACP)",
+    "description": "Soft parchment surfaces with an Okabe-Ito blue accent.",
+    "enabled": true
+  },
+  {
+    "id": "day",
+    "name": "Day",
+    "description": "Neutral light theme with a sky-blue accent.",
+    "enabled": true
+  },
+  {
+    "id": "high-contrast",
+    "name": "High contrast",
+    "description": "Black/white with a yellow accent. Maximum legibility.",
+    "enabled": true
+  }
+]

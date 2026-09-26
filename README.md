@@ -18,6 +18,7 @@ Derived from `prototype.md` (single-file prototype), refactored into a modular
 │   └── js/
 │       ├── inputs.js           # INPUT_TYPES registry — what can become a QR
 │       ├── templates.js        # TEMPLATE_OBJECTS registry — overlay shapes
+│       ├── palettes.js         # PALETTES registry — page color configurations
 │       ├── renderer.js         # QRShapeRenderer: QR → fade wash → finder fix
 │       └── app.js              # glue: config fetch, dynamic form, events
 ├── backend/
@@ -25,7 +26,8 @@ Derived from `prototype.md` (single-file prototype), refactored into a modular
 │   ├── package.json
 │   └── config/
 │       ├── input-types.json    # which input types are enabled + field metadata
-│       └── templates.json      # which template objects are enabled + order
+│       ├── templates.json      # which template objects are enabled + order
+│       └── palettes.json       # which color palettes are enabled + order
 └── README.md
 ```
 
@@ -40,13 +42,21 @@ The page has two columns inside `.container`:
      from `GET /api/input-types` (fallback: `INPUT_TYPES` in `inputs.js`).
    - `<div id="dynamic-fields">` — empty in the HTML; `app.js` renders one
      `<input>` per field of the selected input type. For `website` this is a
-     single "Target URL" box defaulting to `https://barkod.studio`.
+     single "Target URL" box defaulting to `https://en.wikipedia.org/wiki/Main_Page`.
    - `<div id="shape-grid">` — empty in the HTML; `app.js` renders one button
      per entry from `GET /api/templates` (fallback: `TEMPLATE_OBJECTS`).
+   - Fade slider — outside-shape wash strength, applied live via
+     `renderer.refade()` without regenerating the QR matrix.
    - Download button — exports the visible canvas as PNG via
      `canvas.toDataURL('image/png')`.
 
-2. **Preview panel (right)**
+2. **Preview toolbar (right-aligned, above the preview window)**
+   - `<select id="palette-select">` — empty in the HTML; `app.js` fills it
+     from `GET /api/palettes` (fallback: `PALETTES`), applies the choice as
+     CSS variables, and persists it in `localStorage`. Lives outside the
+     preview window so display preference stays separate from the QR workflow.
+
+3. **Preview panel (right)**
    - `<div id="raw-qr">` — hidden (`display: none`). The qrcodejs engine paints
      its raw **square** QR here (an `<img>`/`<canvas>`). It is never shown; the
      renderer only reads its pixels.
@@ -54,7 +64,7 @@ The page has two columns inside `.container`:
      output: white background + masked QR + restored finder patterns.
    - Warning text noting Level H error correction is active.
 
-3. **Script loading (order matters)** — asset paths are relative to the repo
+4. **Script loading (order matters)** — asset paths are relative to the repo
     root so the same file works on GitHub Pages and via the backend:
     ```html
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -80,7 +90,7 @@ Each keystroke / shape click runs:
    silhouette from `TEMPLATE_OBJECTS`), `clip('evenodd')`, then fill with
    `rgba(255,255,255,fade)`. Inside-shape modules stay pure black; outside
     modules turn light gray — visually receding but still decodable. The
-    **fade slider** (0–95%, default 60%) controls this live via the cheap
+    **fade slider** (0–95%, default 50%) controls this live via the cheap
    `renderer.refade()` path, which reuses the cached raw QR without
    regenerating the matrix. `square` skips the wash (plain QR).
 4. **Finder-pattern restore** — the 3 corner squares (top-left, top-right,
@@ -95,7 +105,10 @@ modules and expresses the shape through contrast instead of deletion.
 Measured threshold (real phone camera, Heart template): scanning starts
 working at ~65–66% fade and passes reliably below 65%. In pixel terms, a 65%
 white wash turns black modules to gray ~166 — dimmer than that and decoders
-give up. The UI therefore defaults to 60% (headroom for other phones/lighting).
+give up. The UI therefore defaults to 50%: short URLs (e.g. barkod.studio)
+scan up to ~65%, but denser payloads like long Wikipedia URLs need the extra
+contrast — 60% already fails there. Rule of thumb: the longer the content,
+the lower the fade.
 Other shapes will have their own nearby thresholds; the slider max (95%) is
 kept for experimentation, not production use.
 
@@ -114,6 +127,22 @@ Each shape is `{ id, name, icon, draw(ctx, cx, cy, size) }`. Current set, ported
 from the prototype paths: `heart` (cubic Béziers), `star` (5-spike polar loop),
 `diamond` (4 lines), `shield` (quadratics), `circle` (`arc`), `square` (`rect`
 inset 5%). Backend JSON controls the button list/order.
+
+### Color palettes (`js/palettes.js` + `backend/config/palettes.json`)
+
+ACP = accessible color palette. All page colors flow through 9 CSS variables (`--bg-primary`, `--bg-secondary`,
+`--accent`, `--text`, `--muted`, `--border`, `--input-text`, `--on-accent`,
+`--error`). Each palette supplies all 9; `applyPalette(id)` sets them on
+`:root`. The QR matrix itself always renders black-on-white regardless of
+palette, to protect scannability. The selector choice persists in
+`localStorage` (`qr-studio-palette`).
+
+| Palette | Look | Notes |
+|---|---|---|
+| Abyss (ACP) — **default** | Deep-sea ink `#0b1220`, vivid cyan `#22d3ee` accent | Blue/cyan axis stays distinguishable under all common color-vision deficiencies; dark ground lets the accent stay vivid instead of washing out like pastels |
+| Pastel (ACP) | Soft parchment `#f4efe3`, Okabe-Ito blue `#0072b2` accent | Same safety reasoning in a light, low-saturation flavor; errors always pair color with text |
+| Day | Light slate + sky-blue accent | Neutral light mode |
+| High contrast | Black/white + yellow `#ffd500` accent, white borders | Maximum legibility; muted text kept at `#d4d4d4` so it still passes contrast |
 
 ## Run it
 
@@ -148,3 +177,6 @@ Same fallback behavior as Pages.
 - **New template object** (e.g. cat): add `draw()` path to
   `frontend/js/templates.js` (`TEMPLATE_OBJECTS.cat = {...}`) + entry to
   `backend/config/templates.json`. Nothing else changes.
+- **New color palette** (e.g. brand theme): add all 9 color variables to
+  `frontend/js/palettes.js` (`PALETTES.brand = {...}`) + entry to
+  `backend/config/palettes.json`. Nothing else changes.

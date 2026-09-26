@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QR Shape Mask Studio</title>
+  <title>QR Creator Studio</title>
   <!-- QR matrix engine: generates the raw (square) QR with Level H error correction.
        We then re-render it onto <canvas> through a template-object mask. -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -11,8 +11,8 @@
 </head>
 <body>
 
-  <h1 class="page-title">QR Shape Mask Studio</h1>
-  <p class="page-subtitle">Error-corrected silhouette masking matrix engine</p>
+  <h1 class="page-title">QR Creator Studio</h1>
+  <p class="page-subtitle">An engine for all your custom QR code needs via silhouette masking</p>
 
   <div class="container">
     <!-- ============ Controls (left) ============ -->
@@ -22,7 +22,7 @@
            with fallback to the local INPUT_TYPES registry in frontend/js/inputs.js.
            Only "website" is fully wired today; add new types without touching HTML. -->
       <div class="form-group">
-        <label for="input-type-select">Input Type</label>
+        <label for="input-type-select">Input Format</label>
         <select id="input-type-select"></select>
       </div>
 
@@ -40,12 +40,13 @@
       </div>
 
       <!-- Fade strength: how strongly modules outside the silhouette are
-           washed out. 0 = plain square QR, 0.60 default (safe), ~0.65 = measured
-           Heart scan threshold on a real camera. Wired to renderer.refade(). -->
+           washed out. 0 = plain square QR, 0.50 default (safe middle ground;
+           short URLs scan up to ~0.65, dense URLs need ≤0.50).
+           Wired to renderer.refade(). -->
       <div class="form-group">
-        <label for="fade-slider">Outside-shape fade: <span id="fade-value">60%</span></label>
-        <input type="range" id="fade-slider" min="0" max="95" value="60" step="1" />
-        <div class="field-hint">Lower = easier to scan. Heart tested safe at ≤65% — default 60% leaves headroom.</div>
+        <label for="fade-slider">Outside-shape fade: <span id="fade-value">50%</span></label>
+        <input type="range" id="fade-slider" min="0" max="95" value="50" step="1" />
+        <div class="field-hint">Lower = easier to scan. 50% default suits long URLs; short ones tolerate up to ~65%.</div>
       </div>
 
       <div class="form-group">
@@ -54,7 +55,16 @@
     </div>
 
     <!-- ============ Preview (right) ============ -->
-    <div class="preview-panel">
+    <!-- Display palette toolbar: right-aligned above (not inside) the preview
+         window. Options rendered by app.js from /api/palettes (fallback:
+         PALETTES); applied as CSS variables, persisted in localStorage. -->
+    <div class="preview-column">
+      <div class="preview-toolbar">
+        <label for="palette-select">Palette</label>
+        <select id="palette-select"></select>
+      </div>
+      <div class="palette-hint">ACP: accessible color palette</div>
+      <div class="preview-panel">
       <!-- Hidden node where qrcodejs paints its raw square QR (table/img).
            We never show it; renderer.js reads the <img> pixels into the canvas. -->
       <div id="raw-qr" aria-hidden="true"></div>
@@ -64,12 +74,14 @@
         not deletion — so corner anchors and data modules stay decodable.
         If a camera struggles, lower the fade slider.
       </div>
-    </div>
+      </div><!-- /.preview-panel -->
+    </div><!-- /.preview-column -->
   </div>
 
   <!-- Order matters: registries -> renderer -> app glue -->
   <script src="frontend/js/inputs.js"></script>
   <script src="frontend/js/templates.js"></script>
+  <script src="frontend/js/palettes.js"></script>
   <script src="frontend/js/renderer.js"></script>
   <script src="frontend/js/app.js"></script>
 </body>
