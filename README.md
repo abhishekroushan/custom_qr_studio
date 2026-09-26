@@ -80,7 +80,7 @@ Each keystroke / shape click runs:
    silhouette from `TEMPLATE_OBJECTS`), `clip('evenodd')`, then fill with
    `rgba(255,255,255,fade)`. Inside-shape modules stay pure black; outside
     modules turn light gray — visually receding but still decodable. The
-    **fade slider** (0–95%, default 60%) controls this live via the cheap
+    **fade slider** (0–95%, default 50%) controls this live via the cheap
    `renderer.refade()` path, which reuses the cached raw QR without
    regenerating the matrix. `square` skips the wash (plain QR).
 4. **Finder-pattern restore** — the 3 corner squares (top-left, top-right,
@@ -95,7 +95,10 @@ modules and expresses the shape through contrast instead of deletion.
 Measured threshold (real phone camera, Heart template): scanning starts
 working at ~65–66% fade and passes reliably below 65%. In pixel terms, a 65%
 white wash turns black modules to gray ~166 — dimmer than that and decoders
-give up. The UI therefore defaults to 60% (headroom for other phones/lighting).
+give up. The UI therefore defaults to 50%: short URLs (e.g. barkod.studio)
+scan up to ~65%, but denser payloads like long Wikipedia URLs need the extra
+contrast — 60% already fails there. Rule of thumb: the longer the content,
+the lower the fade.
 Other shapes will have their own nearby thresholds; the slider max (95%) is
 kept for experimentation, not production use.
 

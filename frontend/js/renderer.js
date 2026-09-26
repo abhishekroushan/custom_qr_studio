@@ -6,7 +6,7 @@
  *   2. Paint the FULL QR onto the canvas at full contrast (white bg + full matrix).
  *      Nothing is deleted here, so the complete data pattern always survives.
  *   3. Wash out everything OUTSIDE the template silhouette with a translucent
- *      white overlay (default ~78% opaque). Inside-shape modules stay pure
+ *      white overlay (default 50% opaque). Inside-shape modules stay pure
  *      black; outside-shape modules become light gray — still present for the
  *      decoder, but visually receding so the shape reads clearly.
  *   4. Re-stamp the 3 finder-pattern anchors (top-left, top-right, bottom-left)
@@ -20,8 +20,10 @@
  *
  * fadeStrength: 0 = no wash (plain square QR), 1 = outside fully white
  * (equivalent to the old hard-clip look, minus finder restore). Measured safe
- * zone: Heart scans reliably at ≤0.65 on a real phone camera, so the UI
- * defaults to 0.60 for headroom across phones/lighting. Exposed as a slider
+ * zone: Heart scans reliably at ≤0.65 for short URLs on a real phone camera,
+ * but denser payloads (e.g. long Wikipedia URLs) need more contrast — so the
+ * UI defaults to 0.50 as a middle ground across content lengths, phones, and
+ * lighting. Exposed as a slider
  * for per-shape experimentation.
  */
 
@@ -44,7 +46,7 @@ class QRShapeRenderer {
    * @param {string} templateId  key in TEMPLATE_OBJECTS
    * @param {number} fadeStrength  0..1, how strongly to wash outside modules
    */
-  render(payload, templateId, fadeStrength = 0.60) {
+  render(payload, templateId, fadeStrength = 0.50) {
     this.rawQrDiv.innerHTML = '';
 
     new QRCode(this.rawQrDiv, {

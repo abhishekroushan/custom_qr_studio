@@ -40,12 +40,13 @@
       </div>
 
       <!-- Fade strength: how strongly modules outside the silhouette are
-           washed out. 0 = plain square QR, 0.60 default (safe), ~0.65 = measured
-           Heart scan threshold on a real camera. Wired to renderer.refade(). -->
+           washed out. 0 = plain square QR, 0.50 default (safe middle ground;
+           short URLs scan up to ~0.65, dense URLs need ≤0.50).
+           Wired to renderer.refade(). -->
       <div class="form-group">
-        <label for="fade-slider">Outside-shape fade: <span id="fade-value">60%</span></label>
-        <input type="range" id="fade-slider" min="0" max="95" value="60" step="1" />
-        <div class="field-hint">Lower = easier to scan. Heart tested safe at ≤65% — default 60% leaves headroom.</div>
+        <label for="fade-slider">Outside-shape fade: <span id="fade-value">50%</span></label>
+        <input type="range" id="fade-slider" min="0" max="95" value="50" step="1" />
+        <div class="field-hint">Lower = easier to scan. 50% default suits long URLs; short ones tolerate up to ~65%.</div>
       </div>
 
       <div class="form-group">

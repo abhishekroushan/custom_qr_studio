@@ -17,7 +17,7 @@
 
   let currentTemplateId = 'heart';
   let currentInputTypeId = 'website';
-  let currentFade = 0.60;
+  let currentFade = 0.50;
   let fieldValues = {};
   let inputTypeList = null;
   let templateList = null;
