@@ -49,9 +49,8 @@ describe('backend config files', () => {
   it('template entries have id/name/icon/enabled', () => {
     const templates = load('templates.json');
     const ids = templates.map((t) => t.id);
-    for (const expected of ['heart', 'star', 'diamond', 'shield', 'circle', 'square']) {
-      assert.ok(ids.includes(expected), `template ${expected} listed`);
-    }
+    // Six vector shapes; custom silhouettes live in their own section.
+    assert.deepEqual(ids, ['heart', 'star', 'diamond', 'shield', 'circle', 'square']);
     for (const t of templates) {
       assert.equal(typeof t.name, 'string');
       assert.equal(typeof t.icon, 'string');

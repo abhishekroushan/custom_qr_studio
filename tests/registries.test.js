@@ -95,6 +95,11 @@ describe('TEMPLATE_OBJECTS registry', () => {
       }
     }
   });
+
+  it('no custom entry: silhouettes live outside the shape registry', () => {
+    const TEMPLATES = vm.runInContext('TEMPLATE_OBJECTS', ctx.sandbox);
+    assert.ok(!('custom' in TEMPLATES), 'shape grid is the six vector shapes only');
+  });
 });
 
 describe('PALETTES registry', () => {

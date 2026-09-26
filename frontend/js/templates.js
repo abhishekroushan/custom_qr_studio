@@ -15,6 +15,10 @@
  *   2. Add the matching entry to backend/config/templates.json
  *      (id + name + icon) so the /api/templates list stays in sync.
  *   3. No changes needed in index.html, renderer.js, or app.js.
+ *
+ * Custom image silhouettes live outside this registry: extract.js produces a
+ * bitmap mask composited via QRShapeRenderer.renderWithBitmap(), chosen from
+ * the separate "Use your own image…" section (not the shape grid).
  */
 
 const TEMPLATE_OBJECTS = {

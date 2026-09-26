@@ -19,6 +19,7 @@ Derived from `prototype.md` (single-file prototype), refactored into a modular
 │       ├── inputs.js           # INPUT_TYPES registry — what can become a QR
 │       ├── templates.js        # TEMPLATE_OBJECTS registry — overlay shapes
 │       ├── palettes.js         # PALETTES registry — page color configurations
+│       ├── extract.js          # image → silhouette mask (custom templates)
 │       ├── renderer.js         # QRShapeRenderer: QR → fade wash → finder fix
 │       └── app.js              # glue: config fetch, dynamic form, events
 ├── backend/
@@ -128,6 +129,33 @@ from the prototype paths: `heart` (cubic Béziers), `star` (5-spike polar loop),
 `diamond` (4 lines), `shield` (quadratics), `circle` (`arc`), `square` (`rect`
 inset 5%). Backend JSON controls the button list/order.
 
+### Custom image extraction (`js/extract.js`)
+
+Below the six shapes sits a separate toggle, "Use your own image…" — the
+alternative path for when no built-in shape fits. It opens a **modal dialog**
+(native `<dialog>`: free backdrop, Esc-to-close, focus return, zero page
+layout shift — the QR preview never moves). Inside: an **image URL** field
+(Fetch; pasted `data:image/...` blobs work too) or a **local file upload**.
+Closing without applying loses nothing; panel state persists. The pipeline:
+
+1. **Load** — uploads read locally (no restrictions); pasted `data:image/...`
+   blobs decode locally too (never taint canvas); remote URL fetches request
+   CORS (`crossOrigin="anonymous"`), since pixel readout needs it.
+2. **Extract** — transparent PNGs use the **alpha channel** directly (exact
+   silhouette); other images use a **luminance threshold** (dark = object) with
+   a live slider + invert toggle and a black-on-white preview.
+3. **Apply** — the mask (white-on-transparent, 400px) becomes the active
+   template, composited through `renderer.renderWithBitmap()` — same fade
+   slider, same finder-pattern restore as vector shapes. The section header
+   shows "✓ custom silhouette active"; picking any shape clears it.
+
+Failures never render silently; they yield inline errors: bad URL, unloadable
+file, **CORS-blocked hosts** ("upload the file instead"), or an empty mask
+(coverage ~0% or ~100% — "try the threshold slider or a higher-contrast
+image"). Photographic subjects are beyond thresholding — that would need a
+segmentation model (e.g. backend `rembg`), deliberately out of scope for this
+frontend-only pass.
+
 ### Color palettes (`js/palettes.js` + `backend/config/palettes.json`)
 
 ACP = accessible color palette. All page colors flow through 9 CSS variables (`--bg-primary`, `--bg-secondary`,
@@ -181,7 +209,8 @@ npm test
 |---|---|
 | `config.test.js` | Backend JSON parses; schema + id uniqueness for input-types, templates, palettes |
 | `registries.test.js` | Frontend/backend id sync; URL normalize+validate, text type, shape `draw()` smoke tests, palette application |
-| `renderer.test.js` | QR pipeline with a mocked canvas: Level-H generation, even-odd wash at the right strength, square bypass, corner anchors, `refade()` reuse |
+| `renderer.test.js` | QR pipeline with a mocked canvas: Level-H generation, even-odd wash at the right strength, square bypass, corner anchors, `refade()` reuse, bitmap-mask overlay path |
+| `extract.test.js` | Mask math on synthetic pixels: alpha vs threshold source, invert, cutoff, coverage boundaries, URL validation, error messages |
 | `frontend.test.js` | index.html/app.js wiring (element ids, script order, API contract) and shared defaults (fade 0.50, abyss `:root`, Wikipedia URL) |
 | `server.test.js` | Live HTTP: health, config endpoints, root page, `/frontend/*` + legacy assets |
 | `accessibility.test.js` | WCAG AA contrast per palette; white QR base; 65%-fade threshold math |

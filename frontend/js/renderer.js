@@ -41,12 +41,15 @@ class QRShapeRenderer {
   }
 
   /**
-   * Render payload string through a template object id.
+   * Render payload string through a custom bitmap mask (from extract.js).
+   * Same pipeline as render(), but the wash is cut by the bitmap instead of
+   * a vector path. The mask is remembered so refade() stays cheap.
    * @param {string} payload
-   * @param {string} templateId  key in TEMPLATE_OBJECTS
-   * @param {number} fadeStrength  0..1, how strongly to wash outside modules
+   * @param {HTMLCanvasElement} maskCanvas  white shape on transparent ground
+   * @param {number} fadeStrength  0..1
    */
   render(payload, templateId, fadeStrength = 0.50) {
+    this.lastBitmap = null;
     this.rawQrDiv.innerHTML = '';
 
     new QRCode(this.rawQrDiv, {
@@ -60,9 +63,26 @@ class QRShapeRenderer {
     this.tempoTimer = setTimeout(() => this._composite(templateId, fadeStrength), 60);
   }
 
+  renderWithBitmap(payload, maskCanvas, fadeStrength = 0.50) {
+    this.lastBitmap = maskCanvas;
+    this.rawQrDiv.innerHTML = '';
+
+    new QRCode(this.rawQrDiv, {
+      text: payload || ' ',
+      width: 256,
+      height: 256,
+      correctLevel: QRCode.CorrectLevel.H,
+    });
+
+    clearTimeout(this.tempoTimer);
+    this.tempoTimer = setTimeout(() => this._compositeWithBitmap(maskCanvas, fadeStrength), 60);
+  }
+
   /**
    * Re-apply the fade wash without regenerating the QR matrix (cheap, runs on
    * every slider movement). Falls back to full render if no QR exists yet.
+   * Remembers bitmap masks from renderWithBitmap so custom templates refade
+   * without re-uploading anything.
    */
   refade(templateId, fadeStrength) {
     const qrImg = this.rawQrDiv.querySelector('img');
@@ -71,6 +91,10 @@ class QRShapeRenderer {
     if (!source) {
       // No raw QR cached yet (shouldn't happen after init) — do a full render.
       if (this.lastArgs) this.render(this.lastArgs.payload, templateId, fadeStrength);
+      return;
+    }
+    if (templateId === 'custom' && this.lastBitmap) {
+      this._compositeWithBitmap(this.lastBitmap, fadeStrength, source);
       return;
     }
     this._composite(templateId, fadeStrength, source);
@@ -144,5 +168,48 @@ class QRShapeRenderer {
     ctx.drawImage(source, srcW - sw, 0, sw, sh, size - d, 0, d, d);
     // Bottom-left
     ctx.drawImage(source, 0, srcH - sh, sw, sh, 0, size - d, d, d);
+  }
+
+  /**
+   * Bitmap variant of _composite for custom image masks: full QR, wash cut by
+   * the mask bitmap, anchors restored. Same scannability contract as paths.
+   */
+  _compositeWithBitmap(maskCanvas, fadeStrength, knownSource) {
+    const qrImg = this.rawQrDiv.querySelector('img');
+    const qrCanvas = this.rawQrDiv.querySelector('canvas');
+    const source =
+      knownSource || (qrImg && qrImg.complete && qrImg.naturalWidth ? qrImg : qrCanvas);
+    if (!source) return;
+    if (!knownSource && qrImg && !qrImg.complete) {
+      clearTimeout(this.tempoTimer);
+      this.tempoTimer = setTimeout(
+        () => this._compositeWithBitmap(maskCanvas, fadeStrength),
+        60,
+      );
+      return;
+    }
+    this._drawFull(source);
+    if (fadeStrength > 0.01) this._washOutsideBitmap(maskCanvas, fadeStrength);
+    this._restoreFinderPatterns(source);
+  }
+
+  /**
+   * Wash everything except the mask via an offscreen overlay: paint the wash
+   * over the whole overlay, punch the silhouette out with destination-out
+   * (mask alpha erases), then stamp the overlay onto the QR. The mask canvas
+   * is white-on-transparent from extract.js, so the hole lands exactly inside.
+   */
+  _washOutsideBitmap(maskCanvas, fadeStrength) {
+    const { ctx, canvas } = this;
+    const size = canvas.width;
+    const overlay = document.createElement('canvas');
+    overlay.width = size;
+    overlay.height = size;
+    const octx = overlay.getContext('2d');
+    octx.fillStyle = `rgba(255, 255, 255, ${fadeStrength})`;
+    octx.fillRect(0, 0, size, size);
+    octx.globalCompositeOperation = 'destination-out';
+    octx.drawImage(maskCanvas, 0, 0, size, size);
+    ctx.drawImage(overlay, 0, 0);
   }
 }

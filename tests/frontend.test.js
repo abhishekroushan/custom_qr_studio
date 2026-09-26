@@ -35,6 +35,7 @@ describe('index.html wiring', () => {
       'frontend/js/inputs.js',
       'frontend/js/templates.js',
       'frontend/js/palettes.js',
+      'frontend/js/extract.js',
       'frontend/js/renderer.js',
       'frontend/js/app.js',
     ]);
@@ -60,6 +61,18 @@ describe('index.html wiring', () => {
     const hintAt = html.indexOf('ACP: accessible color palette');
     assert.ok(toolbarAt !== -1 && toolbarAt < panelAt, 'toolbar precedes preview window');
     assert.ok(hintAt > toolbarAt && hintAt < panelAt, 'ACP hint between toolbar and window');
+  });
+
+  it('extract flow lives in a modal dialog, not inline', () => {
+    const toggleAt = html.indexOf('id="extract-toggle"');
+    const dialogAt = html.indexOf('id="extract-dialog"');
+    const dialogCloseAt = html.indexOf('</dialog>');
+    const panelAt = html.indexOf('id="extract-panel"');
+    assert.ok(toggleAt !== -1 && dialogAt > toggleAt, 'toggle precedes the dialog');
+    assert.ok(panelAt > dialogAt && panelAt < dialogCloseAt, 'panel lives inside the dialog');
+    assert.ok(html.includes('aria-labelledby="extract-title"'), 'dialog is labelled');
+    assert.ok(html.includes('id="extract-close"'), 'dialog has a close button');
+    assert.ok(!html.includes('id="extract-panel" hidden'), 'no inline collapsed panel');
   });
 });
 
