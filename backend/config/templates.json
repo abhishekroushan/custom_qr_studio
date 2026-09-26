@@ -4,6 +4,5 @@
   { "id": "diamond", "name": "Diamond", "icon": "◆", "enabled": true },
   { "id": "shield", "name": "Shield", "icon": "🛡", "enabled": true },
   { "id": "circle", "name": "Circle", "icon": "●", "enabled": true },
-  { "id": "square", "name": "Full Block", "icon": "■", "enabled": true },
-  { "id": "custom", "name": "Extract from image", "icon": "🖼️", "enabled": true }
+  { "id": "square", "name": "Full Block", "icon": "■", "enabled": true }
 ]

@@ -77,11 +77,10 @@ describe('INPUT_TYPES registry', () => {
 });
 
 describe('TEMPLATE_OBJECTS registry', () => {
-  it('every backend template id has a frontend implementation', () => {
+  it('every backend template id has a draw() implementation', () => {
     const TEMPLATES = vm.runInContext('TEMPLATE_OBJECTS', ctx.sandbox);
     for (const t of loadJson('templates.json')) {
       assert.ok(TEMPLATES[t.id], `TEMPLATE_OBJECTS.${t.id} implemented`);
-      if (TEMPLATES[t.id].custom) continue; // bitmap mask — covered separately
       assert.equal(typeof TEMPLATES[t.id].draw, 'function');
     }
   });
@@ -89,7 +88,6 @@ describe('TEMPLATE_OBJECTS registry', () => {
   it('every draw() emits canvas path commands without throwing', () => {
     const TEMPLATES = vm.runInContext('TEMPLATE_OBJECTS', ctx.sandbox);
     for (const [id, t] of Object.entries(TEMPLATES)) {
-      if (t.custom) continue; // bitmap mask from extract.js — no path
       for (const size of [400, 200]) {
         const { calls, ctx: mock } = mockPathCtx();
         t.draw(mock, size / 2, size / 2, size);
@@ -98,12 +96,9 @@ describe('TEMPLATE_OBJECTS registry', () => {
     }
   });
 
-  it('custom entry exists for image extraction (no draw path)', () => {
+  it('no custom entry: silhouettes live outside the shape registry', () => {
     const TEMPLATES = vm.runInContext('TEMPLATE_OBJECTS', ctx.sandbox);
-    assert.ok(TEMPLATES.custom, 'TEMPLATE_OBJECTS.custom exists');
-    assert.equal(TEMPLATES.custom.custom, true);
-    assert.equal(typeof TEMPLATES.custom.name, 'string');
-    assert.ok(!('draw' in TEMPLATES.custom), 'custom has no vector path');
+    assert.ok(!('custom' in TEMPLATES), 'shape grid is the six vector shapes only');
   });
 });
 

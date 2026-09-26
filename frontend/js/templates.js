@@ -16,10 +16,9 @@
  *      (id + name + icon) so the /api/templates list stays in sync.
  *   3. No changes needed in index.html, renderer.js, or app.js.
  *
- * Custom image masks are the exception: 'custom' has no draw() path. Its
- * silhouette is a bitmap canvas produced by js/extract.js and composited via
- * QRShapeRenderer's bitmap path (renderWithBitmap). The entry below exists so
- * the shape grid renders the "Extract from image" button in backend order.
+ * Custom image silhouettes live outside this registry: extract.js produces a
+ * bitmap mask composited via QRShapeRenderer.renderWithBitmap(), chosen from
+ * the separate "Extract silhouette from image" section (not the shape grid).
  */
 
 const TEMPLATE_OBJECTS = {
@@ -102,12 +101,5 @@ const TEMPLATE_OBJECTS = {
       const m = size * 0.05;
       ctx.rect(m, m, size - m * 2, size - m * 2);
     },
-  },
-
-  custom: {
-    id: 'custom',
-    name: 'Extract from image',
-    icon: '🖼️',
-    custom: true, // bitmap mask from extract.js — no draw() path
   },
 };

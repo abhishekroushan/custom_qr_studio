@@ -196,7 +196,48 @@ input[type="range"] {
   color: var(--muted);
 }
 
-/* Extract-from-image panel */
+/* Extract silhouette section */
+.section-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  background-color: var(--bg-primary);
+  border: 2px solid var(--border);
+  color: var(--input-text);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.section-toggle:hover { border-color: var(--accent); }
+
+.extract-status {
+  margin-left: auto;
+  color: var(--accent);
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.toggle-chevron {
+  color: var(--muted);
+}
+
+#extract-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+#extract-panel[hidden] { display: none; }
+
+/* Extract-from-image panel rows */
 .extract-row {
   display: flex;
   gap: 0.5rem;

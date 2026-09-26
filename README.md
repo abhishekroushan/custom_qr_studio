@@ -127,14 +127,14 @@ kept for experimentation, not production use.
 Each shape is `{ id, name, icon, draw(ctx, cx, cy, size) }`. Current set, ported
 from the prototype paths: `heart` (cubic Béziers), `star` (5-spike polar loop),
 `diamond` (4 lines), `shield` (quadratics), `circle` (`arc`), `square` (`rect`
-inset 5%). Backend JSON controls the button list/order. The seventh entry,
-`custom` ("Extract from image", listed last), has no vector path — its mask is
-a bitmap produced by `extract.js` (see below).
+inset 5%). Backend JSON controls the button list/order.
 
 ### Custom image extraction (`js/extract.js`)
 
-The "Extract from image" button (below the six shapes) opens a panel accepting
-an **image URL** (Fetch) or a **local file upload**. The pipeline:
+Below the six shapes sits a separate collapsible section, "Extract silhouette
+from image" — the alternative path for when no built-in shape fits. It accepts
+an **image URL** (Fetch; pasted `data:image/...` blobs work too) or a **local
+file upload**. The pipeline:
 
 1. **Load** — uploads read locally (no restrictions); pasted `data:image/...`
    blobs decode locally too (never taint canvas); remote URL fetches request
@@ -142,9 +142,10 @@ an **image URL** (Fetch) or a **local file upload**. The pipeline:
 2. **Extract** — transparent PNGs use the **alpha channel** directly (exact
    silhouette); other images use a **luminance threshold** (dark = object) with
    a live slider + invert toggle and a black-on-white preview.
-3. **Apply** — the mask (white-on-transparent, 400px) becomes the `custom`
+3. **Apply** — the mask (white-on-transparent, 400px) becomes the active
    template, composited through `renderer.renderWithBitmap()` — same fade
-   slider, same finder-pattern restore as vector shapes.
+   slider, same finder-pattern restore as vector shapes. The section header
+   shows "✓ custom silhouette active"; picking any shape clears it.
 
 Failures never render silently; they yield inline errors: bad URL, unloadable
 file, **CORS-blocked hosts** ("upload the file instead"), or an empty mask

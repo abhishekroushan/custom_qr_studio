@@ -36,6 +36,9 @@
   const shapeGrid = document.getElementById('shape-grid');
   const paletteSelect = document.getElementById('palette-select');
   const extractPanel = document.getElementById('extract-panel');
+  const extractToggle = document.getElementById('extract-toggle');
+  const extractStatus = document.getElementById('extract-status');
+  const extractChevron = document.getElementById('extract-chevron');
   const extractUrl = document.getElementById('extract-url');
   const extractFetch = document.getElementById('extract-fetch');
   const extractFile = document.getElementById('extract-file');
@@ -133,12 +136,7 @@
       btn.className = 'shape-btn' + (t.id === currentTemplateId ? ' active' : '');
       btn.dataset.shape = t.id;
       btn.textContent = (t.icon ? t.icon + ' ' : '') + t.name;
-      if (TEMPLATE_OBJECTS[t.id].custom) {
-        // Custom entry opens the extraction panel instead of activating.
-        btn.addEventListener('click', showExtractPanel);
-      } else {
-        btn.addEventListener('click', () => setShape(t.id));
-      }
+      btn.addEventListener('click', () => setShape(t.id));
       shapeGrid.appendChild(btn);
     }
   }
@@ -173,11 +171,12 @@
   // Called by shape buttons (replaces prototype's inline onclick="setShape(...)").
   function setShape(shapeId) {
     if (shapeId === 'custom' && !customMaskCanvas) {
-      // No silhouette yet — guide the user to extraction first.
+      // No silhouette yet — guide the user to the extract section first.
       showExtractPanel();
       return;
     }
     currentTemplateId = shapeId;
+    if (shapeId !== 'custom') extractStatus.textContent = '';
     shapeGrid.querySelectorAll('.shape-btn').forEach((btn) => {
       btn.classList.toggle('active', btn.dataset.shape === shapeId);
     });
@@ -208,11 +207,20 @@
 
   function showExtractPanel() {
     extractPanel.hidden = false;
+    extractToggle.setAttribute('aria-expanded', 'true');
+    extractChevron.textContent = '▾';
     extractPanel.scrollIntoView({ block: 'nearest' });
   }
 
   function hideExtractPanel() {
     extractPanel.hidden = true;
+    extractToggle.setAttribute('aria-expanded', 'false');
+    extractChevron.textContent = '▸';
+  }
+
+  function toggleExtractPanel() {
+    if (extractPanel.hidden) showExtractPanel();
+    else hideExtractPanel();
   }
 
   function setExtractError(err) {
@@ -287,6 +295,7 @@
     }
     customMaskCanvas = maskResultToCanvas(lastExtractResult);
     setExtractError(null);
+    extractStatus.textContent = '✓ custom silhouette active';
     hideExtractPanel();
     setShape('custom'); // mask exists now, so this activates + regenerates
   }
@@ -359,6 +368,7 @@
     extractInvert.addEventListener('change', refreshExtractPreview);
     extractApply.addEventListener('click', applyExtract);
     extractCancel.addEventListener('click', hideExtractPanel);
+    extractToggle.addEventListener('click', toggleExtractPanel);
 
     downloadBtn.addEventListener('click', () => {
       const a = document.createElement('a');

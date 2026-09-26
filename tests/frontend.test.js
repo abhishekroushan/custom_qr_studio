@@ -62,6 +62,15 @@ describe('index.html wiring', () => {
     assert.ok(toolbarAt !== -1 && toolbarAt < panelAt, 'toolbar precedes preview window');
     assert.ok(hintAt > toolbarAt && hintAt < panelAt, 'ACP hint between toolbar and window');
   });
+
+  it('extract section is separate from the shape grid, collapsed by default', () => {
+    const gridAt = html.indexOf('id="shape-grid"');
+    const sectionAt = html.indexOf('id="extract-section"');
+    assert.ok(sectionAt > gridAt, 'extract section follows the shape grid');
+    assert.ok(html.includes('id="extract-toggle"'), 'section has a toggle');
+    assert.ok(html.includes('id="extract-panel" hidden'), 'panel starts collapsed');
+    assert.ok(!html.includes('data-shape="custom"'), 'no custom button baked into markup');
+  });
 });
 
 describe('frontend/backend API contract', () => {

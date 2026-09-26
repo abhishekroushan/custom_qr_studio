@@ -39,11 +39,16 @@
         <div class="shape-grid" id="shape-grid"></div>
       </div>
 
-      <!-- Custom image extraction panel (shown when "Extract from image" is
-           picked). URL fetch or file upload -> silhouette preview -> Apply.
+      <!-- Custom silhouette section: the alternative to the six shapes above.
+           Collapsible; URL fetch or file upload -> live preview -> Apply.
            Failures surface in #extract-error, never silently. -->
-      <div class="form-group" id="extract-panel" hidden>
-        <label>Extract silhouette from image</label>
+      <div class="form-group" id="extract-section">
+        <button id="extract-toggle" class="section-toggle" type="button" aria-expanded="false">
+          <span>🖼️ Extract silhouette from image</span>
+          <span class="extract-status" id="extract-status"></span>
+          <span class="toggle-chevron" id="extract-chevron">▸</span>
+        </button>
+        <div id="extract-panel" hidden>
         <div class="extract-row">
           <input type="text" id="extract-url" placeholder="Image URL, or paste a data:image link" />
           <button id="extract-fetch" class="mini-btn" type="button">Fetch</button>
@@ -67,6 +72,7 @@
           <button id="extract-apply" class="mini-btn primary" type="button">Apply silhouette</button>
           <button id="extract-cancel" class="mini-btn" type="button">Cancel</button>
         </div>
+        </div><!-- /#extract-panel -->
       </div>
 
       <!-- Fade strength: how strongly modules outside the silhouette are
