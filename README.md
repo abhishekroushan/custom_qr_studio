@@ -47,13 +47,16 @@ The page has two columns inside `.container`:
      per entry from `GET /api/templates` (fallback: `TEMPLATE_OBJECTS`).
    - Fade slider — outside-shape wash strength, applied live via
      `renderer.refade()` without regenerating the QR matrix.
-   - `<select id="palette-select">` — empty in the HTML; `app.js` fills it
-     from `GET /api/palettes` (fallback: `PALETTES`), applies the choice as
-     CSS variables, and persists it in `localStorage`.
    - Download button — exports the visible canvas as PNG via
      `canvas.toDataURL('image/png')`.
 
-2. **Preview panel (right)**
+2. **Preview toolbar (right-aligned, above the preview window)**
+   - `<select id="palette-select">` — empty in the HTML; `app.js` fills it
+     from `GET /api/palettes` (fallback: `PALETTES`), applies the choice as
+     CSS variables, and persists it in `localStorage`. Lives outside the
+     preview window so display preference stays separate from the QR workflow.
+
+3. **Preview panel (right)**
    - `<div id="raw-qr">` — hidden (`display: none`). The qrcodejs engine paints
      its raw **square** QR here (an `<img>`/`<canvas>`). It is never shown; the
      renderer only reads its pixels.
@@ -61,7 +64,7 @@ The page has two columns inside `.container`:
      output: white background + masked QR + restored finder patterns.
    - Warning text noting Level H error correction is active.
 
-3. **Script loading (order matters)** — asset paths are relative to the repo
+4. **Script loading (order matters)** — asset paths are relative to the repo
     root so the same file works on GitHub Pages and via the backend:
     ```html
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>

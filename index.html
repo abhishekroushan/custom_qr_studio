@@ -49,21 +49,21 @@
         <div class="field-hint">Lower = easier to scan. 50% default suits long URLs; short ones tolerate up to ~65%.</div>
       </div>
 
-      <!-- Display palette. Options rendered by app.js from /api/palettes
-           (fallback: PALETTES in js/palettes.js); applied as CSS variables.
-           Choice persists in localStorage. -->
-      <div class="form-group">
-        <label for="palette-select">Color Palette</label>
-        <select id="palette-select"></select>
-      </div>
-
       <div class="form-group">
         <button id="download-btn" class="download-btn" type="button">⬇ Download PNG</button>
       </div>
     </div>
 
     <!-- ============ Preview (right) ============ -->
-    <div class="preview-panel">
+    <!-- Display palette toolbar: right-aligned above (not inside) the preview
+         window. Options rendered by app.js from /api/palettes (fallback:
+         PALETTES); applied as CSS variables, persisted in localStorage. -->
+    <div class="preview-column">
+      <div class="preview-toolbar">
+        <label for="palette-select">Palette</label>
+        <select id="palette-select"></select>
+      </div>
+      <div class="preview-panel">
       <!-- Hidden node where qrcodejs paints its raw square QR (table/img).
            We never show it; renderer.js reads the <img> pixels into the canvas. -->
       <div id="raw-qr" aria-hidden="true"></div>
@@ -73,7 +73,8 @@
         not deletion — so corner anchors and data modules stay decodable.
         If a camera struggles, lower the fade slider.
       </div>
-    </div>
+      </div><!-- /.preview-panel -->
+    </div><!-- /.preview-column -->
   </div>
 
   <!-- Order matters: registries -> renderer -> app glue -->
