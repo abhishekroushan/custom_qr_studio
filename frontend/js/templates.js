@@ -18,7 +18,7 @@
  *
  * Custom image silhouettes live outside this registry: extract.js produces a
  * bitmap mask composited via QRShapeRenderer.renderWithBitmap(), chosen from
- * the separate "Extract silhouette from image" section (not the shape grid).
+ * the separate "Use your own image…" section (not the shape grid).
  */
 
 const TEMPLATE_OBJECTS = {

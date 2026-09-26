@@ -131,8 +131,8 @@ inset 5%). Backend JSON controls the button list/order.
 
 ### Custom image extraction (`js/extract.js`)
 
-Below the six shapes sits a separate collapsible section, "Extract silhouette
-from image" — the alternative path for when no built-in shape fits. It accepts
+Below the six shapes sits a separate collapsible section, "Use your own
+image…" — the alternative path for when no built-in shape fits. It accepts
 an **image URL** (Fetch; pasted `data:image/...` blobs work too) or a **local
 file upload**. The pipeline:
 
