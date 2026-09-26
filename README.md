@@ -139,7 +139,6 @@ palette, to protect scannability. The selector choice persists in
 | Abyss (color-blind safe) — **default** | Deep-sea ink `#0b1220`, vivid cyan `#22d3ee` accent | Blue/cyan axis stays distinguishable under all common color-vision deficiencies; dark ground lets the accent stay vivid instead of washing out like pastels |
 | Pastel (color-blind safe) | Soft parchment `#f4efe3`, Okabe-Ito blue `#0072b2` accent | Same safety reasoning in a light, low-saturation flavor; errors always pair color with text |
 | Day | Light slate + sky-blue accent | Neutral light mode |
-| Night | Dark slate `#0f172a` + `#38bdf8` | The original prototype theme |
 | High contrast | Black/white + yellow `#ffd500` accent, white borders | Maximum legibility; muted text kept at `#d4d4d4` so it still passes contrast |
 
 ## Run it

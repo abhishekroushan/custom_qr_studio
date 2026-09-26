@@ -77,23 +77,6 @@ const PALETTES = {
     },
   },
 
-  night: {
-    id: 'night',
-    name: 'Night',
-    description: 'The original dark slate theme.',
-    colors: {
-      '--bg-primary': '#0f172a',
-      '--bg-secondary': '#1e293b',
-      '--accent': '#38bdf8',
-      '--text': '#f8fafc',
-      '--muted': '#94a3b8',
-      '--border': '#334155',
-      '--input-text': '#ffffff',
-      '--on-accent': '#0f172a',
-      '--error': '#f87171',
-    },
-  },
-
   'high-contrast': {
     id: 'high-contrast',
     name: 'High contrast',
