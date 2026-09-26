@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QR Shape Mask Studio</title>
+  <title>QR Creator Studio</title>
   <!-- QR matrix engine: generates the raw (square) QR with Level H error correction.
        We then re-render it onto <canvas> through a template-object mask. -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -11,8 +11,8 @@
 </head>
 <body>
 
-  <h1 class="page-title">QR Shape Mask Studio</h1>
-  <p class="page-subtitle">Error-corrected silhouette masking matrix engine</p>
+  <h1 class="page-title">QR Creator Studio</h1>
+  <p class="page-subtitle">An engine for all your custom QR code needs via silhouette masking</p>
 
   <div class="container">
     <!-- ============ Controls (left) ============ -->
@@ -22,7 +22,7 @@
            with fallback to the local INPUT_TYPES registry in frontend/js/inputs.js.
            Only "website" is fully wired today; add new types without touching HTML. -->
       <div class="form-group">
-        <label for="input-type-select">Input Type</label>
+        <label for="input-type-select">Input Format</label>
         <select id="input-type-select"></select>
       </div>
 
