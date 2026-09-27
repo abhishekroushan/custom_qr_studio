@@ -1,7 +1,7 @@
 {
   "name": "qr-studio-backend",
   "version": "1.0.0",
-  "description": "Static host + config API for QR Shape Mask Studio",
+  "description": "Static host + config API for QR Creator Studio",
   "type": "commonjs",
   "main": "server.js",
   "scripts": {

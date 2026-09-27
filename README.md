@@ -1,6 +1,6 @@
-# QR Shape Mask Studio
+# QR Creator Studio
 
-Templatized QR code generator: type a **website URL** (or other input types later),
+Templatized QR code generator: type a **website URL** (more input formats later),
 pick a **template object** (heart, star, diamond, shield, circle, square), and the
 app renders the QR masked into that silhouette — while keeping it scannable.
 
@@ -14,7 +14,7 @@ Derived from `prototype.md` (single-file prototype), refactored into a modular
 ├── index.html                # page skeleton (repo root, for GitHub Pages)
 ├── prototype.md                # original single-file prototype (reference)
 ├── frontend/
-│   ├── css/styles.css          # dark-theme layout (extracted from prototype)
+│   ├── css/styles.css          # theme variables + layout (extracted from prototype)
 │   └── js/
 │       ├── inputs.js           # INPUT_TYPES registry — what can become a QR
 │       ├── templates.js        # TEMPLATE_OBJECTS registry — overlay shapes
@@ -36,11 +36,14 @@ Derived from `prototype.md` (single-file prototype), refactored into a modular
 
 ### `index.html` — the page
 
-The page has two columns inside `.container`:
+The page header reads "QR Creator Studio" with the subtitle "An engine for
+all your custom QR code needs via silhouette masking", followed by two
+columns inside `.container`:
 
 1. **Control panel (left)**
-   - `<select id="input-type-select">` — empty in the HTML; `app.js` fills it
-     from `GET /api/input-types` (fallback: `INPUT_TYPES` in `inputs.js`).
+   - `<select id="input-type-select">` (labeled "Input Format") — empty in the
+     HTML; `app.js` fills it from `GET /api/input-types` (fallback:
+     `INPUT_TYPES` in `inputs.js`).
    - `<div id="dynamic-fields">` — empty in the HTML; `app.js` renders one
      `<input>` per field of the selected input type. For `website` this is a
      single "Target URL" box defaulting to `https://en.wikipedia.org/wiki/Main_Page`.
@@ -71,6 +74,7 @@ The page has two columns inside `.container`:
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="frontend/js/inputs.js"></script>
     <script src="frontend/js/templates.js"></script>
+    <script src="frontend/js/palettes.js"></script>
     <script src="frontend/js/renderer.js"></script>
     <script src="frontend/js/app.js"></script>
     ```
@@ -106,9 +110,9 @@ modules and expresses the shape through contrast instead of deletion.
 Measured threshold (real phone camera, Heart template): scanning starts
 working at ~65–66% fade and passes reliably below 65%. In pixel terms, a 65%
 white wash turns black modules to gray ~166 — dimmer than that and decoders
-give up. The UI therefore defaults to 50%: short URLs (e.g. barkod.studio)
-scan up to ~65%, but denser payloads like long Wikipedia URLs need the extra
-contrast — 60% already fails there. Rule of thumb: the longer the content,
+give up. The UI therefore defaults to 50%: short URLs scan up to ~65%, but
+denser payloads like long Wikipedia URLs need the extra contrast — 60%
+already fails there. Rule of thumb: the longer the content,
 the lower the fade.
 Other shapes will have their own nearby thresholds; the slider max (95%) is
 kept for experimentation, not production use.
