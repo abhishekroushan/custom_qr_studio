@@ -1,5 +1,5 @@
 /**
- * server.js — minimal backend for QR Shape Mask Studio.
+ * server.js — minimal backend for QR Creator Studio.
  *
  * Responsibilities:
  *   1. Serve the app (root index.html + frontend/ assets) so `npm start`
@@ -59,5 +59,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`QR Shape Mask Studio: http://localhost:${PORT}`);
+  console.log(`QR Creator Studio: http://localhost:${PORT}`);
 });
